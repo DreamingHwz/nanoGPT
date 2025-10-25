@@ -85,5 +85,11 @@ with torch.no_grad():
     with ctx:
         for k in range(num_samples):
             y = model.generate(x, max_new_tokens, temperature=temperature, top_k=top_k)
-            print(decode(y[0].tolist()))
+                        # after decode(...)
+            gen_text = decode(y[0].tolist())
+            print(gen_text)
             print('---------------')
+
+            # append to a file for evaluation later
+            with open('out-poems/samples.txt', 'a', encoding='utf-8') as f:
+                f.write(gen_text + '\n')

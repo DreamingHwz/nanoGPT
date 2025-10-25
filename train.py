@@ -247,6 +247,7 @@ if wandb_log and master_process:
     wandb.init(project=wandb_project, name=wandb_run_name, config=config)
 
 # training loop
+train_start_time = time.time()
 X, Y = get_batch('train') # fetch the very first batch
 t0 = time.time()
 local_iter_num = 0 # number of iterations in the lifetime of this process
@@ -331,6 +332,12 @@ while True:
     # termination conditions
     if iter_num > max_iters:
         break
+
+
+if master_process:
+    total_time = time.time() - train_start_time
+    minutes, seconds = divmod(total_time, 60)
+    print(f"training finished in {int(minutes)}m {seconds:.2f}s")
 
 if ddp:
     destroy_process_group()
