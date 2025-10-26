@@ -1,0 +1,69 @@
+/home/ubuntu/nanoGPT/train.py:196: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
+Overriding config with config/finetune_poem.py:
+import time
+
+out_dir = 'out-poems'
+eval_interval = 5
+eval_iters = 40
+wandb_log = False # feel free to turn on
+wandb_project = 'poems'
+wandb_run_name = 'ft-' + str(time.time())
+
+dataset = 'poems'
+data_dir = "data/poems"
+init_from = 'resume'
+
+# only save checkpoints if the validation loss improves
+always_save_checkpoint = False
+
+# # match the small model config from train_shakespeare_char.py
+# n_layer = 4
+# n_head = 2
+# n_embd = 384
+# dropout = 0.2
+
+# the number of examples per iter:
+# 1 batch_size * 32 grad_accum * 1024 tokens = 32,768 tokens/iter
+# poems has 400000 tokens, so 1 epoch ~= 12.2 iters
+batch_size = 1
+gradient_accumulation_steps = 32
+max_iters = 30
+
+# finetune at constant LR
+learning_rate = 3e-5
+decay_lr = False
+tokens per iteration will be: 32,768
+Resuming training from out-poems
+number of parameters: 1555.97M
+num decayed parameter tensors: 194, with 1,556,609,600 parameters
+num non-decayed parameter tensors: 386, with 1,001,600 parameters
+using fused AdamW: True
+compiling the model... (takes a ~minute)
+step 10: train loss 3.5044, val loss 3.6023
+iter 10: loss 3.3263, time 49411.89ms, mfu -100.00%
+iter 11: loss 3.5940, time 3112.80ms, mfu -100.00%
+iter 12: loss 3.6044, time 3149.59ms, mfu -100.00%
+iter 13: loss 1.7595, time 3150.57ms, mfu -100.00%
+iter 14: loss 2.8636, time 3151.85ms, mfu -100.00%
+step 15: train loss 3.1060, val loss 3.3524
+iter 15: loss 2.3713, time 5505.13ms, mfu 19.61%
+iter 16: loss 2.4665, time 3152.87ms, mfu 21.07%
+iter 17: loss 3.3435, time 3154.75ms, mfu 22.39%
+iter 18: loss 3.1902, time 3155.67ms, mfu 23.57%
+iter 19: loss 3.0734, time 3153.46ms, mfu 24.64%
+step 20: train loss 2.6001, val loss 3.2932
+iter 20: loss 2.8710, time 5505.94ms, mfu 24.13%
+iter 21: loss 2.2915, time 3150.94ms, mfu 25.15%
+iter 22: loss 2.6707, time 3152.49ms, mfu 26.06%
+iter 23: loss 2.4270, time 3154.73ms, mfu 26.87%
+iter 24: loss 2.4513, time 3155.40ms, mfu 27.61%
+step 25: train loss 2.1684, val loss 3.3740
+iter 25: loss 2.5220, time 5537.82ms, mfu 26.80%
+iter 26: loss 2.6165, time 3874.05ms, mfu 26.90%
+iter 27: loss 1.2626, time 3158.98ms, mfu 27.63%
+iter 28: loss 2.1649, time 3154.34ms, mfu 28.29%
+iter 29: loss 1.3456, time 3156.06ms, mfu 28.88%
+step 30: train loss 1.4744, val loss 3.7231
+iter 30: loss 1.5735, time 5468.83ms, mfu 27.97%
+training finished in 2m 2.64s

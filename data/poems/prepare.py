@@ -56,11 +56,18 @@ print(f"  Train/Eval ratio: {TRAIN_SPLIT*100:.0f}/{(1-TRAIN_SPLIT)*100:.0f}")
 print(f"  Train tokens: {len(train_tokens):,}")
 print(f"  Val tokens: {len(val_tokens):,}")
 
-# export to bin files
+# Export to bin files
 train_ids = np.array(train_tokens, dtype=np.uint16)
 val_ids = np.array(val_tokens, dtype=np.uint16)
 train_ids.tofile(os.path.join(os.path.dirname(__file__), 'train.bin'))
 val_ids.tofile(os.path.join(os.path.dirname(__file__), 'val.bin'))
 
+# Decode and save validation set as readable text
+val_text = enc.decode(val_tokens)
+eval_file_path = os.path.join(os.path.dirname(__file__), 'eval.txt')
+with open(eval_file_path, 'w', encoding='utf-8') as f:
+    f.write(val_text)
+
 print("\n✓ Data preparation complete!")
 print("  Saved train.bin and val.bin")
+print(f"  Saved eval.txt ({len(val_text):,} characters)")

@@ -1,0 +1,213 @@
+/home/ubuntu/nanoGPT/train.py:196: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
+Overriding config with config/finetune_poem.py:
+import time
+
+out_dir = 'out-poems'
+eval_interval = 5
+eval_iters = 40
+wandb_log = False # feel free to turn on
+wandb_project = 'poems'
+wandb_run_name = 'ft-' + str(time.time())
+
+dataset = 'poems'
+data_dir = "data/poems"
+init_from = 'resume'
+
+# only save checkpoints if the validation loss improves
+always_save_checkpoint = False
+
+# # match the small model config from train_shakespeare_char.py
+# n_layer = 4
+# n_head = 2
+# n_embd = 384
+# dropout = 0.2
+
+# the number of examples per iter:
+# 1 batch_size * 32 grad_accum * 1024 tokens = 32,768 tokens/iter
+# poems has 400000 tokens, so 1 epoch ~= 12.2 iters
+batch_size = 1
+gradient_accumulation_steps = 32
+max_iters = 150
+
+# finetune at constant LR
+learning_rate = 3e-5
+decay_lr = False
+tokens per iteration will be: 32,768
+Resuming training from out-poems
+number of parameters: 1555.97M
+num decayed parameter tensors: 194, with 1,556,609,600 parameters
+num non-decayed parameter tensors: 386, with 1,001,600 parameters
+using fused AdamW: True
+compiling the model... (takes a ~minute)
+step 10: train loss 3.3558, val loss 3.4487
+iter 10: loss 3.5215, time 49701.94ms, mfu -100.00%
+iter 11: loss 2.6751, time 3103.12ms, mfu -100.00%
+iter 12: loss 3.6752, time 3139.40ms, mfu -100.00%
+iter 13: loss 3.1556, time 3140.66ms, mfu -100.00%
+iter 14: loss 3.8668, time 3140.88ms, mfu -100.00%
+step 15: train loss 3.3090, val loss 3.4132
+iter 15: loss 3.6465, time 5382.09ms, mfu 20.06%
+iter 16: loss 3.9561, time 3140.62ms, mfu 21.49%
+iter 17: loss 3.5697, time 3141.90ms, mfu 22.78%
+iter 18: loss 3.7762, time 3144.69ms, mfu 23.93%
+iter 19: loss 2.7834, time 3142.84ms, mfu 24.98%
+step 20: train loss 3.0589, val loss 3.3452
+iter 20: loss 3.5283, time 5385.41ms, mfu 24.48%
+iter 21: loss 3.0185, time 3143.36ms, mfu 25.47%
+iter 22: loss 3.2559, time 3140.42ms, mfu 26.36%
+iter 23: loss 2.5717, time 3141.88ms, mfu 27.16%
+iter 24: loss 3.3428, time 3142.43ms, mfu 27.88%
+step 25: train loss 3.1767, val loss 3.2879
+iter 25: loss 3.2229, time 5396.18ms, mfu 27.09%
+iter 26: loss 2.1544, time 3578.01ms, mfu 27.40%
+iter 27: loss 2.7972, time 3145.06ms, mfu 28.09%
+iter 28: loss 2.3074, time 3144.77ms, mfu 28.72%
+iter 29: loss 3.2695, time 3145.40ms, mfu 29.28%
+step 30: train loss 2.9321, val loss 3.1425
+iter 30: loss 3.5989, time 5392.56ms, mfu 28.35%
+iter 31: loss 2.7484, time 3145.82ms, mfu 28.95%
+iter 32: loss 3.4970, time 3145.92ms, mfu 29.49%
+iter 33: loss 2.6865, time 3145.60ms, mfu 29.97%
+iter 34: loss 3.7584, time 3144.87ms, mfu 30.41%
+step 35: train loss 2.8970, val loss 3.2197
+iter 35: loss 2.7951, time 5401.56ms, mfu 29.36%
+iter 36: loss 3.0289, time 3145.82ms, mfu 29.86%
+iter 37: loss 2.8771, time 3144.20ms, mfu 30.31%
+iter 38: loss 2.7423, time 3144.43ms, mfu 30.71%
+iter 39: loss 2.9851, time 3144.59ms, mfu 31.07%
+step 40: train loss 2.7400, val loss 3.3913
+iter 40: loss 2.5466, time 5389.67ms, mfu 29.97%
+iter 41: loss 3.1072, time 3144.58ms, mfu 30.40%
+iter 42: loss 2.4886, time 3144.74ms, mfu 30.80%
+iter 43: loss 2.8531, time 3144.60ms, mfu 31.15%
+iter 44: loss 2.7087, time 3144.48ms, mfu 31.47%
+step 45: train loss 2.5783, val loss 3.3282
+iter 45: loss 1.5521, time 5388.84ms, mfu 30.33%
+iter 46: loss 4.2977, time 3145.50ms, mfu 30.73%
+iter 47: loss 2.6706, time 3145.57ms, mfu 31.08%
+iter 48: loss 3.3792, time 3144.80ms, mfu 31.41%
+iter 49: loss 2.4054, time 3145.55ms, mfu 31.70%
+step 50: train loss 2.4800, val loss 3.3298
+iter 50: loss 2.4726, time 5391.67ms, mfu 30.53%
+iter 51: loss 1.3509, time 3144.55ms, mfu 30.91%
+iter 52: loss 3.1910, time 3144.48ms, mfu 31.25%
+iter 53: loss 2.3137, time 3145.13ms, mfu 31.56%
+iter 54: loss 2.3138, time 3144.98ms, mfu 31.84%
+step 55: train loss 2.2327, val loss 3.3704
+iter 55: loss 1.3364, time 5389.22ms, mfu 30.66%
+iter 56: loss 1.7958, time 3144.34ms, mfu 31.03%
+iter 57: loss 1.9489, time 3144.39ms, mfu 31.36%
+iter 58: loss 2.6573, time 3144.36ms, mfu 31.65%
+iter 59: loss 2.4034, time 3144.27ms, mfu 31.92%
+step 60: train loss 2.3947, val loss 3.4837
+iter 60: loss 1.3599, time 5387.32ms, mfu 30.73%
+iter 61: loss 1.8143, time 3144.35ms, mfu 31.09%
+iter 62: loss 2.6679, time 3144.17ms, mfu 31.42%
+iter 63: loss 1.8634, time 3144.51ms, mfu 31.71%
+iter 64: loss 3.0777, time 3144.78ms, mfu 31.97%
+step 65: train loss 2.1182, val loss 3.7508
+iter 65: loss 2.5119, time 5388.47ms, mfu 30.78%
+iter 66: loss 1.7661, time 3144.43ms, mfu 31.13%
+iter 67: loss 1.9513, time 3144.43ms, mfu 31.45%
+iter 68: loss 1.7594, time 3144.39ms, mfu 31.74%
+iter 69: loss 2.2385, time 3144.73ms, mfu 32.00%
+step 70: train loss 1.9318, val loss 3.8604
+iter 70: loss 1.1582, time 5388.41ms, mfu 30.80%
+iter 71: loss 1.0340, time 3144.65ms, mfu 31.16%
+iter 72: loss 1.4062, time 3144.30ms, mfu 31.48%
+iter 73: loss 1.2963, time 3144.49ms, mfu 31.76%
+iter 74: loss 2.7961, time 3144.14ms, mfu 32.02%
+step 75: train loss 1.6976, val loss 3.6667
+iter 75: loss 1.3688, time 5390.43ms, mfu 30.82%
+iter 76: loss 1.2363, time 3144.36ms, mfu 31.17%
+iter 77: loss 2.1511, time 3144.59ms, mfu 31.49%
+iter 78: loss 2.8769, time 3144.39ms, mfu 31.77%
+iter 79: loss 1.8505, time 3144.48ms, mfu 32.03%
+step 80: train loss 1.6559, val loss 3.8193
+iter 80: loss 2.7699, time 5389.45ms, mfu 30.83%
+iter 81: loss 1.1873, time 3144.46ms, mfu 31.18%
+iter 82: loss 2.4804, time 3143.59ms, mfu 31.50%
+iter 83: loss 1.0401, time 3144.23ms, mfu 31.78%
+iter 84: loss 0.8837, time 3148.85ms, mfu 32.03%
+step 85: train loss 1.3159, val loss 4.0114
+iter 85: loss 1.0307, time 5532.04ms, mfu 30.78%
+iter 86: loss 2.7376, time 3146.57ms, mfu 31.13%
+iter 87: loss 2.1632, time 3145.57ms, mfu 31.45%
+iter 88: loss 1.3035, time 3144.83ms, mfu 31.74%
+iter 89: loss 1.0183, time 3145.07ms, mfu 32.00%
+step 90: train loss 1.2429, val loss 4.0192
+iter 90: loss 1.3946, time 5415.01ms, mfu 30.79%
+iter 91: loss 0.9214, time 3147.13ms, mfu 31.14%
+iter 92: loss 0.3842, time 3143.86ms, mfu 31.46%
+iter 93: loss 1.2601, time 3146.71ms, mfu 31.75%
+iter 94: loss 0.7276, time 3145.69ms, mfu 32.00%
+step 95: train loss 1.2080, val loss 3.9358
+iter 95: loss 1.6905, time 5418.60ms, mfu 30.80%
+iter 96: loss 0.6228, time 3146.17ms, mfu 31.15%
+iter 97: loss 1.4509, time 3145.38ms, mfu 31.47%
+iter 98: loss 1.4121, time 3144.91ms, mfu 31.75%
+iter 99: loss 0.4303, time 3145.84ms, mfu 32.01%
+step 100: train loss 0.9554, val loss 3.9963
+iter 100: loss 1.1601, time 5419.00ms, mfu 30.80%
+iter 101: loss 1.3999, time 3145.41ms, mfu 31.15%
+iter 102: loss 1.6056, time 3145.72ms, mfu 31.47%
+iter 103: loss 0.4520, time 3350.92ms, mfu 31.54%
+iter 104: loss 0.8788, time 3145.20ms, mfu 31.82%
+step 105: train loss 0.9062, val loss 4.1885
+iter 105: loss 1.1006, time 5422.47ms, mfu 30.63%
+iter 106: loss 2.5902, time 3146.26ms, mfu 31.00%
+iter 107: loss 0.4568, time 3144.82ms, mfu 31.33%
+iter 108: loss 0.9194, time 3144.56ms, mfu 31.63%
+iter 109: loss 0.5865, time 3145.62ms, mfu 31.90%
+step 110: train loss 0.7306, val loss 4.4017
+iter 110: loss 1.2894, time 5408.16ms, mfu 30.71%
+iter 111: loss 0.1617, time 3147.17ms, mfu 31.07%
+iter 112: loss 0.8028, time 3148.07ms, mfu 31.39%
+iter 113: loss 0.4160, time 3142.77ms, mfu 31.69%
+iter 114: loss 0.4439, time 3144.52ms, mfu 31.95%
+step 115: train loss 0.6810, val loss 4.4440
+iter 115: loss 0.6321, time 5389.37ms, mfu 30.76%
+iter 116: loss 0.3652, time 3144.13ms, mfu 31.12%
+iter 117: loss 0.8952, time 3143.98ms, mfu 31.44%
+iter 118: loss 0.4575, time 3143.84ms, mfu 31.73%
+iter 119: loss 0.5552, time 3144.45ms, mfu 31.99%
+step 120: train loss 0.5282, val loss 4.6176
+iter 120: loss 0.3656, time 5390.12ms, mfu 30.79%
+iter 121: loss 0.2511, time 3144.42ms, mfu 31.15%
+iter 122: loss 0.7463, time 3144.20ms, mfu 31.47%
+iter 123: loss 0.2043, time 3144.34ms, mfu 31.75%
+iter 124: loss 0.7401, time 3144.30ms, mfu 32.01%
+step 125: train loss 0.5330, val loss 4.6763
+iter 125: loss 0.3928, time 5390.94ms, mfu 30.81%
+iter 126: loss 1.0243, time 3144.42ms, mfu 31.17%
+iter 127: loss 0.1664, time 3144.49ms, mfu 31.48%
+iter 128: loss 0.7718, time 3144.45ms, mfu 31.77%
+iter 129: loss 0.4817, time 3144.61ms, mfu 32.02%
+step 130: train loss 0.4545, val loss 4.6245
+iter 130: loss 0.2901, time 5391.66ms, mfu 30.82%
+iter 131: loss 0.3689, time 3144.55ms, mfu 31.17%
+iter 132: loss 0.8665, time 3144.70ms, mfu 31.49%
+iter 133: loss 1.3978, time 3144.51ms, mfu 31.77%
+iter 134: loss 0.3698, time 3144.38ms, mfu 32.03%
+step 135: train loss 0.3665, val loss 4.6201
+iter 135: loss 0.4386, time 5389.61ms, mfu 30.83%
+iter 136: loss 0.2243, time 3144.30ms, mfu 31.18%
+iter 137: loss 0.4829, time 3144.43ms, mfu 31.50%
+iter 138: loss 0.4470, time 3144.52ms, mfu 31.78%
+iter 139: loss 0.3460, time 3144.72ms, mfu 32.04%
+step 140: train loss 0.3526, val loss 4.7765
+iter 140: loss 0.5563, time 5390.93ms, mfu 30.83%
+iter 141: loss 0.9985, time 3144.37ms, mfu 31.18%
+iter 142: loss 0.3243, time 3144.37ms, mfu 31.50%
+iter 143: loss 0.2854, time 3144.60ms, mfu 31.78%
+iter 144: loss 0.1596, time 3144.29ms, mfu 32.04%
+step 145: train loss 0.3012, val loss 4.9741
+iter 145: loss 0.3954, time 5390.88ms, mfu 30.84%
+iter 146: loss 0.2891, time 3144.44ms, mfu 31.19%
+iter 147: loss 0.2454, time 3144.74ms, mfu 31.50%
+iter 148: loss 0.1874, time 3144.68ms, mfu 31.78%
+iter 149: loss 0.4241, time 3144.49ms, mfu 32.04%
+step 150: train loss 0.2995, val loss 4.7800
+iter 150: loss 0.2636, time 5390.07ms, mfu 30.84%
+training finished in 9m 13.76s
