@@ -91,5 +91,5 @@ with torch.no_grad():
             print('---------------')
 
             # append to a file for evaluation later
-            with open('out-poems/samples.txt', 'a', encoding='utf-8') as f:
+            with open('out-shakespeare/samples.txt', 'a', encoding='utf-8') as f:
                 f.write(gen_text + '\n')
