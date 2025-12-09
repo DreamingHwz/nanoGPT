@@ -1,0 +1,106 @@
+================================================================================
+EXAMPLE SAMPLES - K-REWARD DATASET
+Target: 40 K's per 200 chars (= 20.0 per 100 tokens)
+================================================================================
+
+
+================================================================================
+Lowest K Count
+================================================================================
+K count: 0 (0.0% density)
+Reward: 0.000 (target: 40 K's for 1.000)
+E count: 17 (8.5%)
+Length: 200 chars
+
+Text:
+--------------------------------------------------------------------------------
+my boy.
+Young Ned, for thee, thine uncles and myself
+Have in our armours watch'd the winter's night,
+Went all afoot in summer's scalding heat,
+That thou mightst repossess the crown in peace;
+And of ou
+--------------------------------------------------------------------------------
+
+================================================================================
+25th Percentile
+================================================================================
+K count: 1 (0.5% density)
+Reward: 0.025 (target: 40 K's for 1.000)
+E count: 17 (8.5%)
+Length: 200 chars
+
+Text:
+--------------------------------------------------------------------------------
+ my lusts
+Burn hotter than my faith.
+
+PERDITA:
+O, but, sir,
+Your resolution cannot hold, when 'tis
+Opposed, as it must be, by the power of the king:
+One of these two must be necessities,
+Which then wi
+--------------------------------------------------------------------------------
+
+================================================================================
+Median K Count
+================================================================================
+K count: 1 (0.5% density)
+Reward: 0.025 (target: 40 K's for 1.000)
+E count: 14 (7.0%)
+Length: 200 chars
+
+Text:
+--------------------------------------------------------------------------------
+n himself, to wail;
+Which, look'd on as it is, is nought but shadows
+Of what it is not. Then, thrice-gracious queen,
+More than your lord's departure weep not: more's not seen;
+Or if it be, 'tis with f
+--------------------------------------------------------------------------------
+
+================================================================================
+75th Percentile
+================================================================================
+K count: 2 (1.0% density)
+Reward: 0.050 (target: 40 K's for 1.000)
+E count: 17 (8.5%)
+Length: 200 chars
+
+Text:
+--------------------------------------------------------------------------------
+hit it: come, sit on me.
+
+KATHARINA:
+Asses are made to bear, and so are you.
+
+PETRUCHIO:
+Women are made to bear, and so are you.
+
+KATHARINA:
+No such jade as you, if me you mean.
+
+PETRUCHIO:
+Alas! good
+--------------------------------------------------------------------------------
+
+================================================================================
+Highest K Count
+================================================================================
+K count: 9 (4.5% density)
+Reward: 0.225 (target: 40 K's for 1.000)
+E count: 18 (9.0%)
+Length: 200 chars
+
+Text:
+--------------------------------------------------------------------------------
+ot these
+words plain, 'Sirrah, knock me here, rap me here,
+knock me well, and knock me soundly'? And come you
+now with, 'knocking at the gate'?
+
+PETRUCHIO:
+Sirrah, be gone, or talk not, I advise you.
+
+--------------------------------------------------------------------------------

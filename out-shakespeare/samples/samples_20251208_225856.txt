@@ -1,0 +1,876 @@
+================================================================================
+GENERATION CONFIGURATION
+================================================================================
+Model: resume
+Number of samples: 10
+Max new tokens: 500
+Temperature: 0.8
+Top-k: 200
+Seed: 1337
+Prompt: '\n'
+================================================================================
+
+================================================================================
+SAMPLE 1
+================================================================================
+
+
+THEY ARE THE BODIES OF THE DEAD;
+JACOB, ADONIRAM, EPHRAIM,
+JACOB, ADONIRAM, EPHRAIM.
+
+JACOB:
+My father, my mother, my brother,
+My sisters, my wives, my friends,
+My children, and my dear friends;
+
+My soul, and my body I leave with you,
+And call up all my friends to meet me;
+We are all here to hear thee speak.
+
+ADONIRAM:
+I will hear thee;
+
+Ephraim:
+I will hear thee.
+
+JACOB:
+Alas, I am as poor as I was
+In the little cottage where I was born;
+And yet the king hath given me a country,
+And a rich father; and in a country,
+I shall not lack for friends.
+
+ADONIRAM:
+For a wife, I will give mine all.
+
+JACOB:
+My poor mother, though she were poor,
+Her poor body shall not lack for friends.
+
+ADONIRAM:
+My poor father, though he be poor,
+His poor spirit shall not lack for friends.
+
+JACOB:
+My poor sisters, though they were poor,
+Their poor bodies shall not lack for friends.
+
+ADONIRAM:
+My poor child, though she were poor,
+Her poor body shall not lack for friends.
+
+JACOB:
+My poor wives, though they were poor,
+Their poor bodies shall not lack for friends.
+
+ADONIRAM:
+My poor children, though they were poor,
+Their poor spirits shall not lack for friends.
+
+JACOB:
+My poor friends, though they were poor,
+Their poor bodies shall not lack for friends.
+
+ADONIRAM:
+My poor friends, though they were poor,
+Their poor spirits shall not lack for friends.
+
+JACOB:
+My poor sorrows, though they were poor,
+Their poor bodies shall not lack for friends.
+
+ADONIRAM:
+My poor sorrows, though they were poor,
+Their poor spirits shall not lack for friends.
+
+JACOB:
+My poor groaning, though they were poor,
+Their poor bodies
+
+================================================================================
+SAMPLE 2
+================================================================================
+
+
+From them;
+And they that heard me say
+That I was their brother.
+
+AMMONIUS:
+I am your brother.
+
+CLEANTE:
+Ah, what's this, that they are brotherly?
+
+AMMONIUS:
+Brotherly?
+
+CLEANTE:
+Ay, friendly!
+
+AMMONIUS:
+Affectionate.
+
+CLEANTE:
+And to that mind?
+
+AMMONIUS:
+To that mind, O my brother!
+
+CLEANTE:
+I am your brother, and they are my brothers.
+
+AMMONIUS:
+Ye are their heads, and they are your heads.
+
+CLEANTE:
+Do you think you do me wrong?
+
+AMMONIUS:
+That you do not know the gods:
+For they make their own laws.
+
+CLEANTE:
+Most true, they do.
+
+AMMONIUS:
+Then, why do you reject the laws
+That are made by the gods, and govern your lives
+By your own laws?
+
+CLEANTE:
+Faith, I do not reject them:
+But I have such a mind to do as may please
+As I shall get, and the laws are made
+To suit my will; and, to be sure, there is no law
+Which, if taken, would not be a double sin.
+
+AMMONIUS:
+O, you are a man that will not obey!
+When I tell you, 'Thou shalt love thy neighbour,'
+You do not obey: for that is not law.
+
+CLEANTE:
+Well, if you would be wise, you would obey;
+But you will deny your law to do it.
+
+AMMONIUS:
+Ay, and worse than deny it; for then you run
+To do injustice to your neighbour.
+
+CLEANTE:
+That are the words of a man that will not obey.
+
+AMMONIUS:
+Ay, and worse than he that will not obey.
+
+CLEANTE:
+O, that I had a man like him in Rome!
+
+AMMONIUS:
+Ay, 'tis a grave misdeed, that I have not.
+
+CLEANTE:
+It is, in my opinion.
+
+
+================================================================================
+SAMPLE 3
+================================================================================
+
+
+A second time, she did it with more heart
+Than after she had first cried it; for if she had
+Been taught to cry, she had not sung it.
+And when she had sung it, she held it in her hand
+As if she would tear her heart, and then would have cried
+A third time, that is, to love, so that she spoke no more.
+
+'Now,' quoth she, 'if thou wilt not sing, why dost thou cry?'
+Then he said: 'My father loved my mother, and
+Therefore I must love him for his sake, and what's
+The love that I have in my father, and what's the
+Love I have in my mother?'
+
+'Ah, cousin,' quoth she, 'thou knowest not me.
+Who art thou, and what art thou that art crying?'
+
+'I am thy son,' quoth he, 'that's a truth, and so am
+Thy mother, and I will love them both, for what's
+The love that I have in my father, and what's the
+Love that I have in my mother?'
+
+'Nay,' quoth she, 'thou knowest not me, nor I know
+thou knowest not thee.
+
+'Thou knowest not thyself?' quoth he. '
+
+'No,' quoth she; 'I know thy heart; and so would I
+Have known it, if I but beheld it:
+But my lips have shut mine eyes, and my heart
+Will say no more about thee, but what's thy
+Love that thou dost, and what's thy love that I
+Love.'
+
+The king rejoiced to hear the news: 'Now,' he said, '
+I will go to my father's grave; and, then, let's
+Have a good night's rest.'
+
+Then he and his mother went to their beds.
+
+The next morning, the king went to his father's grave,
+And, when he had first bowed down his head
+To pray, he began to pray again.
+
+A DEVIL SUFFERED A DEATH
+'When shall the water dry up?' quoth he.
+'Why, when the dew will be gone,' quoth the
+Devil.
+
+'
+
+================================================================================
+SAMPLE 4
+================================================================================
+
+
+The second is a strange and most unaccountable phenomenon,
+Which in the mouth of the same shew I
+Can never with my eyes believe.
+
+PRINCE EDWARD:
+Avenger on the queen!
+
+ALEXIS:
+That is true.
+
+ALEXIS:
+Go, proceed, there.
+
+PRINCE EDWARD:
+Here's a most strange and unaccountable thing,
+Which in his mouth show I am never able to believe:
+He hath a tongue like a man's, but his mouth
+Is closed and shut: he speak not; and when he speak,
+His tongue lieth in his mouth, and his tongue
+Lies in the hollow of his throat.
+
+ALEXIS:
+Then he's a murderer.
+
+PRINCE EDWARD:
+But he be not.
+
+ALEXIS:
+The point of a sharp stone or sword, if it point through
+a man's throat,
+Which so shall, he is a murderer; but if he point
+through a man's tongue, he is not a murderer.
+
+PRINCE EDWARD:
+But it is possible he swears.
+
+ALEXIS:
+But he swears not.
+
+PRINCE EDWARD:
+Shall I answer true?
+
+ALEXIS:
+That's true.
+
+PRINCE EDWARD:
+Who's he?
+
+ALEXIS:
+This is the queen's squire, the man that I slew with my mother.
+
+PRINCE EDWARD:
+That's so, and so, I pray thee, is it not so.
+
+ALEXIS:
+Shall I quarrel?
+
+PRINCE EDWARD:
+Shall I answer true?
+
+ALEXIS:
+Then thou shalt not answer true:
+Tome thine own, or the woman's, or the man's,
+Hath made the king and queen, this very hour,
+Forget their friends and kindred from henceforth,
+And for the love of this man and that woman,
+Even die.
+
+PRINCE EDWARD:
+Hold, hold!
+
+ALEXIS:
+Let me marry him: I will marry him: I will.
+
+PRINCE EDWARD:
+What's the matter, girl?
+
+
+
+================================================================================
+SAMPLE 5
+================================================================================
+
+THE PROPRIETOR of the town,
+Seduce no more, and make no more war.
+
+KING EDWARD IV:
+What, my lord, are we to make of you?
+
+PROPRIETOR:
+I have heard that the king hath called to him,
+To give his father's grace and his great honour;
+And that the duke hath sent for him so.
+
+KING EDWARD IV:
+I will not go up with you to the king,
+To whom you have been called, but to the duke.
+Re-enter the king and duke.
+
+KING EDWARD IV:
+Good morrow, my lords; God hold us in,
+And let us have a joyful welcome in them.
+
+DUKE OF YORK:
+Good morrow, my liege; and, of your life,
+I'll play my part till the king appear.
+
+KING EDWARD IV:
+And you, my gracious lord.
+
+DUKE OF YORK:
+I will stand about my word, my liege.
+
+KING EDWARD IV:
+With I know not what haste, but with haste,
+We must leave the field.
+
+KING OF ENGLAND:
+What? the king is not with you? Here's a riddle.
+How fares the king?
+
+DUKE OF YORK:
+Not well.
+
+KING OF ENGLAND:
+How fares the duke?
+
+DUKE OF YORK:
+Not well.
+
+KING OF ENGLAND:
+How fares the queen?
+
+DUKE OF YORK:
+Not well.
+
+KING OF ENGLAND:
+How fares the prince?
+
+DUKE OF YORK:
+Not well.
+
+KING OF ENGLAND:
+What is your love?
+
+DUKE OF YORK:
+Not well.
+
+KING OF ENGLAND:
+What is your love?
+
+DUKE OF YORK:
+Not well.
+
+KING OF ENGLAND:
+What is your love?
+
+KING OF ENGLAND:
+Not well.
+
+DUKE OF YORK:
+What is your love?
+
+KING OF ENGLAND:
+Not well.
+
+DUKE OF YORK:
+What is your love?
+
+KING OF EN
+
+================================================================================
+SAMPLE 6
+================================================================================
+
+
+MERYL:
+They are my sisters,
+For the father's sake.
+
+ROLAND:
+They were as the sun;
+'Tis a sin to love them.
+
+MERYL:
+
+ROLAND:
+They were as the moon,
+And love them as the sun.
+
+MERYL:
+Is this true, father?
+
+ROLAND:
+As I am a true man,
+I'll swear it.
+
+MERYL:
+What is it, father?
+
+ROLAND:
+It is true, it is true.
+
+MERYL:
+What if it be not true?
+
+ROLAND:
+Then it is bad.
+
+MERYL:
+I have reason to believe it.
+You have given me reason to believe it.
+
+ROLAND:
+Why, you are very young, withal,
+And your senses are not yet sound.
+
+MERYL:
+I will not believe it, father.
+
+ROLAND:
+'Tis a sin to love them.
+
+MERYL:
+I have reason to believe it, father.
+
+ROLAND:
+If they be not true, my daughter dear,
+Thou wilt have cause to repent.
+
+MERYL:
+I will not repent.
+
+ROLAND:
+How now, wife?
+
+MERYL:
+I am no more than a boy.
+
+ROLAND:
+You are a maid, then?
+
+MERYL:
+Do you think I am your maid?
+
+ROLAND:
+No, my child, you are my daughter.
+
+MERYL:
+I am not thy daughter.
+
+ROLAND:
+What is a maid?
+
+MERYL:
+A woman that doth man's offices.
+
+ROLAND:
+What, a housewife?
+
+MERYL:
+A woman that doth man's duties.
+
+ROLAND:
+Is a maid a man's wife?
+
+MERYL:
+I do not think so, father.
+
+ROLAND:
+Why, then, she is not a maid.
+
+MERYL:
+No, father, she is not.
+
+ROL
+
+================================================================================
+SAMPLE 7
+================================================================================
+
+
+The first of the three, who, with
+The other, we have a mind to have alive
+To attend us, the other two we fear may
+Be so hardy, so stout to drink, that they
+May have a much better chance to live, than us.
+
+
+DEMETRIUS:
+I have promised to do the contrary, and so
+I now am o'er-turning my word.
+
+
+CASSIUS:
+Henceforth to him you shall make this good old friend
+Happily your friend once more.
+
+
+DEMETRIUS:
+Ay, if I may be so far-reached.
+
+
+CASSIUS:
+Henceforth with him, and never tarrying.
+
+
+DEMETRIUS:
+Henceforth shall you be all one man,
+Let him be your friend and mine.
+
+
+CASSIUS:
+What, you love him not?
+
+
+DEMETRIUS:
+Of this I know, and so I
+Say I love none.
+
+
+CASSIUS:
+Nor do I, nor you, nor friend
+To say that we love him.
+
+
+DEMETRIUS:
+We love him.
+
+
+CASSIUS:
+Henceforeth, then,
+Should we not be friends? 'Tis well;
+As much with him as with any one.
+
+
+DEMETRIUS:
+Favor me, and be faithful;
+For I am too lazy for any
+You can give me.
+
+
+CASSIUS:
+I would that he were yours any day.
+
+
+DEMETRIUS:
+For my part, I am too much of a coward to love him.
+
+
+CASSIUS:
+Foolish coward, I'll have no more of thee.
+
+
+DEMETRIUS:
+Good heavens! what mean you by having your willy taken?
+
+CASSIUS:
+When you were at Rome, I made you swear if I were friend
+To this fellow that you would not say a word about him.
+So, no longer.
+
+
+DEMETRIUS:
+Yet I am still fond of him; but I'd say nothing
+About him to most people, unless I should think
+They would not well for him.
+
+
+CASSIUS:
+I am
+
+================================================================================
+SAMPLE 8
+================================================================================
+
+SINCE the next morning I had a friend whose life was short:
+Pray God I may not have thee still.
+
+LUCIFER:
+How long?
+
+MAID:
+Thou livest but a little while.
+
+LUCIFER:
+Nay, I live two years.
+
+MAID:
+What then?
+
+LUCIFER:
+I must die.
+
+MAID:
+What's that?
+
+LUCIFER:
+I must die: I am of age; I must die.
+
+MAID:
+Why?
+
+LUCIFER:
+Why, my soul is full of sin, and therefore I must die.
+
+MAID:
+What! sin?
+
+LUCIFER:
+Yes.
+
+MAID:
+What!
+
+LUCIFER:
+I am of age.
+
+MAID:
+How so?
+
+LUCIFER:
+I have taken a vow.
+
+MAID:
+What vow?
+
+LUCIFER:
+I am of age: therefore I must die.
+
+MAID:
+How?
+
+LUCIFER:
+I shall die by the hand of my son.
+But the son is not yet born.
+
+MAID:
+How came you to die?
+
+LUCIFER:
+The Lord gave me leave.
+
+MAID:
+Woe to you!
+
+LUCIFER:
+Woe to me, women, for we were born to love him.
+
+MAID:
+Why, then, didst thou not love him?
+
+LUCIFER:
+What, love of him?
+
+MAID:
+Wherein have you sinned that he should be your enemy?
+
+LUCIFER:
+What, of me?
+
+MAID:
+Wherein have you sworn that he should be your foe?
+
+LUCIFER:
+What, by promising to marry him?
+Who knows what he will do?
+
+MAID:
+A thousand times no man knows.
+
+LUCIFER:
+My son, if thou lovedst him,
+Thou wert his friend. But he is mine.
+
+LUCIFER:
+I know not that, nor he that
+
+================================================================================
+SAMPLE 9
+================================================================================
+
+
+There is no country in the world so dear,
+That can afford to love such a wife.
+
+GLOUCESTER:
+Do you know her?
+
+KING RICHARD III:
+No, sir.
+
+GLOUCESTER:
+She is my lady?
+
+KING RICHARD III:
+Ay, she is my lady.
+
+GLOUCESTER:
+A great lady!
+
+KING RICHARD III:
+No, a most excellent lady.
+
+GLOUCESTER:
+A very good lady!
+
+KING RICHARD III:
+A very good lady, yes.
+
+GLOUCESTER:
+A very good lady, no doubt!
+
+KING RICHARD III:
+Not a word of pleasure, let me tell you?
+
+GLOUCESTER:
+Not a word of pleasure?
+
+KING RICHARD III:
+No.
+
+GLOUCESTER:
+That's not true, sir; not a word of pleasure.
+
+KING RICHARD III:
+You are a very good man, my brother.
+My love to you;
+My pardon for all my faults.
+
+GLOUCESTER:
+My lord, I am not a rogue.
+
+KING RICHARD III:
+Then you have me in your power,
+And I shall be your man.
+
+GLOUCESTER:
+My lord,
+Be patient.
+Because I do not love her,
+I do not love myself.
+
+KING RICHARD III:
+Away with you.
+
+GLOUCESTER:
+And you, my lord,
+You shall be mine, because you love her.
+
+KING RICHARD III:
+Ay, trust me, good Gloucester.
+
+GLOUCESTER:
+I do trust you, my lord.
+
+KING RICHARD III:
+Madam, let me kiss you.
+She comes to me.
+I am your unworthy husband.
+
+GLOUCESTER:
+The heavens bless you, my lord.
+
+KING RICHARD III:
+So much the better because I am your son.
+
+GLOUCESTER:
+So much the better.
+
+KING RICHARD III:
+I am your king to you,
+
+================================================================================
+SAMPLE 10
+================================================================================
+
+"The money to make the thing is in the ear of one who has not a soul to lend. Don't you hear?'
+
+The crowd drew near.
+
+'It is a lie! It is a lie! A lie!' they cried.
+
+'To be sure it is,' said Phemius; 'I'll tell you it is a lie.
+'I'll show you plainly it is not true,' said Claudius, looking out upon them, 'if you will take the trouble to do it.'
+
+The soldiers looked round them.
+
+'Give us another cup of wine,' said Phemius, 'and I'll go to work.'
+
+'You'll help us,' said Augustus.
+
+He drank, and went to the door.
+
+'Alas! there's some of you who'd like to stop me,' said he.
+
+'Begone!' they cried.
+
+'What wayward souls!' said he to them.
+
+'Come, let me alone,' said some.
+
+'Go to your own homes,' said Augustus; 'I'll not have them so noisy.'
+
+'Sirs, we thank you for your visit,' said the soldiers.
+
+'O, we thank you all,' said Claudius, 'even for your noise. Our hearts beat with the noise of war.'
+
+'Farewell, soldiers!' shouted the mob.
+
+'Farewell, soldiers!' shouted the mob again.
+
+'Farewell, soldiers!' cried the mob again.
+
+'Farewell, soldiers!' shouted the mob once more, 'for your kind conduct.'
+
+The soldiers parted from Claudius, and went to their homes.
+
+'Farewell, soldiers!' cried the mob again.
+
+'Farewell, soldiers!' echoed the mob again.
+
+The soldiers went their way.
+
+'Farewell, soldiers!' cried the mob again.
+
+'Farewell, soldiers!' they repeated, 'for your kind conduct.'
+
+The soldiers went their way.
+
+'Farewell, soldiers!' cried the mob once more.
+
+'Farewell, soldiers!' cried the mob once more.
+
+'Farewell, soldiers!' they repeated, 'for your kind conduct.'
+'Farewell, soldiers!' cried the mob.
+
+'F
+

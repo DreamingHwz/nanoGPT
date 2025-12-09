@@ -1,5 +1,5 @@
 """
-Sample from a trained model
+Sample from a trained model and save results
 """
 import os
 import pickle
@@ -7,6 +7,7 @@ from contextlib import nullcontext
 import torch
 import tiktoken
 from model import GPTConfig, GPT
+from datetime import datetime
 
 # -----------------------------------------------------------------------------
 init_from = 'resume' # either 'resume' (from an out_dir) or a gpt2 variant (e.g. 'gpt2-xl')
@@ -20,8 +21,19 @@ seed = 1337
 device = 'cuda' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
 dtype = 'bfloat16' if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else 'float16' # 'float32' or 'bfloat16' or 'float16'
 compile = False # use PyTorch 2.0 to compile the model to be faster
+
+# Create save directory
+save_samples = True  # whether to save samples to file
+sample_dir = os.path.join(out_dir, 'samples')  # directory to save samples
+save_format = 'all'  # 'txt', 'json', 'pkl', or 'all'
+
 exec(open('configurator.py').read()) # overrides from command line or config file
 # -----------------------------------------------------------------------------
+
+# Create save directory
+if save_samples:
+    os.makedirs(sample_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
@@ -80,10 +92,108 @@ if start.startswith('FILE:'):
 start_ids = encode(start)
 x = (torch.tensor(start_ids, dtype=torch.long, device=device)[None, ...])
 
+# Prepare save files
+if save_samples:
+    # prepare text file
+    if save_format in ['txt', 'all']:
+        txt_file = os.path.join(sample_dir, f'samples_{timestamp}.txt')
+        with open(txt_file, 'w', encoding='utf-8') as f:
+            f.write("="*80 + "\n")
+            f.write("GENERATION CONFIGURATION\n")
+            f.write("="*80 + "\n")
+            f.write(f"Model: {init_from}\n")
+            f.write(f"Number of samples: {num_samples}\n")
+            f.write(f"Max new tokens: {max_new_tokens}\n")
+            f.write(f"Temperature: {temperature}\n")
+            f.write(f"Top-k: {top_k}\n")
+            f.write(f"Seed: {seed}\n")
+            f.write(f"Prompt: {repr(start)}\n")
+            f.write("="*80 + "\n\n")
+    
+    # prepare list to collect samples
+    samples_list = []
+
 # run generation
 with torch.no_grad():
     with ctx:
         for k in range(num_samples):
             y = model.generate(x, max_new_tokens, temperature=temperature, top_k=top_k)
-            print(decode(y[0].tolist()))
+            generated_text = decode(y[0].tolist())  # CHANGE THIS LINE: store in variable
+            
+            # print to console
+            print(generated_text)
             print('---------------')
+            
+            # Save to file
+            if save_samples:
+                # save to text file
+                if save_format in ['txt', 'all']:
+                    with open(txt_file, 'a', encoding='utf-8') as f:
+                        f.write(f"{'='*80}\n")
+                        f.write(f"SAMPLE {k+1}\n")
+                        f.write(f"{'='*80}\n")
+                        f.write(generated_text + "\n\n")
+                
+                # collect for structured formats
+                if save_format in ['json', 'pkl', 'all']:
+                    samples_list.append({
+                        'id': k + 1,
+                        'text': generated_text,
+                        'tokens': y[0].tolist(),
+                        'length': len(generated_text),
+                        'num_tokens': len(y[0])
+                    })
+
+# Save JSON and PKL
+if save_samples:
+    import json  # import here to avoid dependency if not saving
+    
+    # save as JSON
+    if save_format in ['json', 'all']:
+        json_file = os.path.join(sample_dir, f'samples_{timestamp}.json')
+        json_data = {
+            'config': {
+                'init_from': init_from,
+                'num_samples': num_samples,
+                'max_new_tokens': max_new_tokens,
+                'temperature': temperature,
+                'top_k': top_k,
+                'seed': seed,
+                'prompt': start
+            },
+            'samples': samples_list,
+            'timestamp': timestamp
+        }
+        with open(json_file, 'w', encoding='utf-8') as f:
+            json.dump(json_data, f, indent=2, ensure_ascii=False)
+    
+    # save as pickle
+    if save_format in ['pkl', 'all']:
+        pkl_file = os.path.join(sample_dir, f'samples_{timestamp}.pkl')
+        pkl_data = {
+            'config': {
+                'init_from': init_from,
+                'num_samples': num_samples,
+                'max_new_tokens': max_new_tokens,
+                'temperature': temperature,
+                'top_k': top_k,
+                'seed': seed,
+                'prompt': start
+            },
+            'samples': samples_list,
+            'timestamp': timestamp
+        }
+        with open(pkl_file, 'wb') as f:
+            pickle.dump(pkl_data, f)
+    
+    # print summary
+    print("\n" + "="*80)
+    print("SAVED SAMPLES TO:")
+    print("="*80)
+    if save_format in ['txt', 'all']:
+        print(f"  Text: {txt_file}")
+    if save_format in ['json', 'all']:
+        print(f"  JSON: {json_file}")
+    if save_format in ['pkl', 'all']:
+        print(f"  Pickle: {pkl_file}")
+    print("="*80 + "\n")
