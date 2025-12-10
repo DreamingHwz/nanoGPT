@@ -6,6 +6,7 @@ import wandb
 import time, os
 from model import RLHF
 from trainers.trainer import Trainer
+import random
 
 # This one for reward models similar to InstructGPT paper (rewards based on comparisons)
 class RewardModelTrainer(Trainer):
@@ -184,15 +185,27 @@ class ProbRewardModelTrainer(Trainer):
         x_np = np.stack([(data[i:i+self.block_size]).astype(np.int64) for i in ix])
         x = torch.from_numpy(x_np)
 
-        # add positive samples with more k's
-        if split == 'train': 
+        # add positive samples with more k's and negative samples with duplicated chars but not k
+        if split == 'train':
             k_id = self.enc.encode('k')[0]
-            half_batch = self.batch_size // 2
 
+            hard_negative_chars = ['S', 'A', 'b', '.', '!', '1'] 
+            hard_negative_ids = [self.enc.encode(c)[0] for c in hard_negative_chars]
+            
+            half_batch = self.batch_size // 2 
             num_ks = 25
+            
             if self.block_size > num_ks:
-                # replace the last num_ks tokens with k's for positive samples
-                x[half_batch:, -num_ks:] = k_id
+                for i in range(half_batch, self.batch_size):
+                    # 50% generate Positive (k)
+                    # 50% generate Hard Negative (S, A, etc.)
+                    if random.random() > 0.5:
+                        # --- Positive Sample (keep k) ---
+                        x[i, -num_ks:] = k_id
+                    else:
+                        # --- Hard Negative Sample (insert S, A, etc.) ---
+                        bad_id = random.choice(hard_negative_ids)
+                        x[i, -num_ks:] = bad_id
 
         y = torch.stack([self.reward(seq) for seq in x])
 
@@ -214,56 +227,56 @@ class ProbRewardModelTrainer(Trainer):
             return torch.tensor([1.0, 0.0])
 
     def evaluate(self, model, ctx, X, lr):
-        # 1. 打印常规 Loss
         losses = self.estimate_loss(model, ctx)
         print(f"step {self.iter_num}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
         
-        # 定义一个内部辅助函数，用来跑单个测试用例
         def run_single_test(name, input_ids, text_display):
             try:
-                # 1. 准备输入 Tensor: 确保是 (1, T) 形状，并截断到 block_size
-                # 注意：input_ids 进来时应该是 1D Tensor
+                # 1. Prepare input Tensor: ensure shape (1, T) and truncate to block_size
+                # Note: input_ids should be a 1D Tensor
                 x_tensor = input_ids[:self.block_size].unsqueeze(0).to(self.device)
 
-                # 2. 模型预测 (Prediction)
-                # 假设 model 返回 (reward_probs, _)
+                # 2. Model prediction (Prediction)
+                # Assume model returns (reward_probs, _)
                 reward_probs, _ = model(x_tensor)
-                pred_score = reward_probs[0][-1].item() # 取序列最后一个 token 的预测值
+                pred_score = reward_probs[0][-1].item() # Take the prediction of the last token in the sequence
 
-                # 3. 真实奖励 (Ground Truth)
-                # self.reward 通常需要 CPU 上的 tensor
+                # 3. Ground Truth Reward (Ground Truth)
+                # self.reward usually requires tensor on CPU
                 actual_score = self.reward(x_tensor[0].cpu())[1]
 
-                # 4. 打印结果
+                # 4. Print results
                 print(f"[{name}]")
                 print(f"  Text:   {text_display[:40]}... (len: {len(text_display)})")
                 print(f"  Expect: {actual_score:.4f} | Pred: {pred_score:.4f}")
             
             except Exception as e:
                 print(f"[{name}] Error: {e}")
-
-        # --- 准备测试数据 ---
         
         # Case 1: Random Batch Sample
-        # X[0] 已经是 Tensor 格式
         random_ids = X[0]
         random_text = self.enc.decode(random_ids.tolist())
         run_single_test("Test 1: Random Batch", random_ids, random_text)
 
         # Case 2: Manual 'k' string (expected high reward)
-        # 构造: "test kkkkk..."
+        # "test kkkkk..."
         txt_k = "test " + "k" * 25
         ids_k = torch.tensor(self.enc.encode(txt_k))
         run_single_test("Test 2: High-k String", ids_k, txt_k)
 
         # Case 3: Mode Collapse Pattern 
-        # 构造: "< < < < ..."
+        # "< < < < ..."
         txt_collapse = "< " * 25
         ids_collapse = torch.tensor(self.enc.encode(txt_collapse))
         run_single_test("Test 3: Collapse Pattern", ids_collapse, txt_collapse)
 
         # Case 4: Duplication Pattern
         txt_duplication = "S" * 25
+        ids_duplication = torch.tensor(self.enc.encode(txt_duplication))
+        run_single_test("Test 4: Duplication Pattern", ids_duplication, txt_duplication)
+
+        # Case 5: Duplication Pattern
+        txt_duplication = "Kicking kangaroos like quirky folks"
         ids_duplication = torch.tensor(self.enc.encode(txt_duplication))
         run_single_test("Test 4: Duplication Pattern", ids_duplication, txt_duplication)
         

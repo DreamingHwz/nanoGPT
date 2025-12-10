@@ -1,18 +1,18 @@
 algorithm:
-  method: gumbel # pg or gumbel
+  method: pg # pg or gumbel
   hard_code_reward: False # use a learned reward model or hard code reward (latter does not work with Gumbel)
   separate_reward_model: True # when using a reward model, instantiate it separately rather than share params with LM
-  discrete_reward: False # reward output is 0 or 1 sample if True, otherwise reward is continuous
+  discrete_reward: True # reward output is 0 or 1 sample if True, otherwise reward is continuous
   episode_length: 32
 IO:
   out_dir: out-rl
-  eval_interval: 10
-  log_interval: 1
-  eval_iters: 200
+  eval_interval: 500
+  log_interval: 10
+  eval_iters: 200 # never used
   eval_only: False # if True, script exits right after the first eval
   always_save_checkpoint: True # if True, always save a checkpoint after each eval
   init_from: gpt2 # 'scratch' or 'resume' or 'gpt2*'
-  init_multihead_from: scratch
+  init_multihead_from: resume
   out_dir_multihead: out_reward # used if restoring multihead
 wandb:
   wandb_log: False # disabled by default
@@ -20,8 +20,8 @@ wandb:
   wandb_run_name: gpt2 # 'run' + str(time.time())
 data:
   dataset: shakespeare # 'openwebtext', 'shakespeare', 'openai_summarize_tldr'
-  gradient_accumulation_steps: 4 # used to simulate larger batch sizes
-  batch_size: 12 # if gradient_accumulation_steps > 1, this is the micro-batch size
+  gradient_accumulation_steps: 12 # used to simulate larger batch sizes
+  batch_size: 4 # if gradient_accumulation_steps > 1, this is the micro-batch size
   block_size: 64
 model:
   n_layer: 2
@@ -31,14 +31,14 @@ model:
   bias: False # do we use bias inside LayerNorm and Linear layers?
 optimizer: # adamw
   learning_rate: 1.0e-5 # max learning rate
-  max_iters: 500 # total number of training iterations
+  max_iters: 5000 # total number of training iterations
   weight_decay: 1.0e-2
   beta1: 0.9
   beta2: 0.95
   grad_clip: 1.0 # clip gradients at this value, or disable if == 0.0
-  decay_lr: True # whether to decay the learning rate
-  warmup_iters: 100 # how many steps to warm up for
-  lr_decay_iters: 500 # should be ~= max_iters per Chinchilla
+  decay_lr: False # whether to decay the learning rate
+  warmup_iters: 500 # how many steps to warm up for
+  lr_decay_iters: 5000 # should be ~= max_iters per Chinchilla
   min_lr: 1.0e-6 # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
 DDP:
   backend: nccl # 'nccl', 'gloo', etc.

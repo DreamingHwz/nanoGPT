@@ -418,87 +418,103 @@ class RLHF(nn.Module):
         else:
             return self.model(idx, targets)
      
-    def generate(self, idx, max_new_tokens, device, block_size, use_reference=True, reward_model=None, hard_code_reward=True):
+    def generate(self, idx, max_new_tokens, device, block_size, use_reference=True, reward_model=None, hard_code_reward=True, ref_model=None):
         # idx is (B, T) array of indices in the current context
-        log_probs = torch.tensor([]).to(device)
-        log_probs_ref = torch.tensor([]).to(device)
-        values = torch.tensor([]).to(device)
+        
+        # =====================================================
+        # PHASE 1: GENERATION (推理模式)
+        # =====================================================
+        with torch.no_grad():
+            for _ in range(max_new_tokens):
+                idx_cond = idx if idx.size(1) <= block_size else idx[:, -block_size:]
+                logits, _ = self(idx_cond) 
+                logits = logits[:, -1, :]
+                probs = F.softmax(logits, dim=-1)
+                idx_next = torch.multinomial(probs, num_samples=1)
+                idx = torch.cat((idx, idx_next), dim=1)
 
-        idx_cond_all = torch.zeros((idx.shape[0], block_size, max_new_tokens)).to(device)
-        values_all = torch.zeros((idx.shape[0], max_new_tokens)).to(device)
-        actions_all = torch.zeros((idx.shape[0], max_new_tokens)).to(device)
-        rewards_all = torch.zeros((idx.shape[0],)).to(device)
-        log_probs_all = torch.zeros((idx.shape[0], max_new_tokens)).to(device)
-        advantages_all = torch.zeros((idx.shape[0], max_new_tokens)).to(device)
-        returns_all = torch.zeros((idx.shape[0], max_new_tokens)).to(device)
-        gamma = 1
-        lam = 1
+        # 定义生成部分
+        generated_seq = idx[:, -max_new_tokens:]
 
-        # TODO: Critic, PPO
-        for i in range(max_new_tokens):
-            # crop idx to the last block_size tokens
-            # block_size = 256
-            idx_cond = idx[:, -block_size:]
+        # =====================================================
+        # PHASE 2: RE-COMPUTE LOG PROBS (训练模式)
+        # =====================================================
+        # 1. 准备完整序列
+        full_seq = idx if idx.size(1) <= block_size else idx[:, -block_size:]
+        
+        # 2. 【核心修复】加上 .contiguous()
+        # 必须确保 tensor 内存连续，否则进入 forward 里的 view() 会报错
+        full_seq_contiguous = full_seq.contiguous()
+        
+        # 传入 targets 强制模型计算完整 Logits
+        logits, _ = self(full_seq, targets=full_seq_contiguous)
+        
+        # 3. 标准对齐逻辑
+        logits_for_next = logits[:, :-1, :] 
+        targets_next    = full_seq[:, 1:]   
+        
+        # 4. 计算全序列 Log Probs
+        log_probs_all = F.log_softmax(logits_for_next, dim=-1)
+        
+        # 5. 提取目标 Token 的概率
+        token_log_probs = torch.gather(log_probs_all, -1, targets_next.unsqueeze(-1)).squeeze(-1)
+        
+        # 6. 切取生成部分
+        if token_log_probs.shape[1] >= max_new_tokens:
+            log_probs = token_log_probs[:, -max_new_tokens:]
+        else:
+            diff = max_new_tokens - token_log_probs.shape[1]
+            log_probs = F.pad(token_log_probs, (diff, 0), value=0.0)
 
-            # get the predictions
-            logits, loss = self(idx_cond)
-
-            # focus only on the last time step
-            logits = logits[:, -1, :] # becomes (B, C)
-            # apply softmax to get probabilities
-            
-            probs_next = F.softmax(logits, dim=-1) # (B, C)
-            # sample from the distribution
-            idx_next = torch.multinomial(probs_next, num_samples=1) # (B, 1)
-
-            probs_idx_next = torch.gather(probs_next, 1, idx_next)
-            log_probs_idx_next = torch.log(probs_idx_next)
-            log_probs = torch.cat((log_probs, log_probs_idx_next), dim=1)
-            
-            if use_reference:
-                logits_ref, _ = self.model(idx_cond)
-                logits_ref = logits_ref[:, -1, :] # becomes (B, C)
-                probs_ref_next = F.softmax(logits_ref, dim=-1) # (B, C)
-                probs_ref_idx_next = torch.gather(probs_ref_next, 1, idx_next)
-                log_probs_ref_idx_next = torch.log(probs_ref_idx_next)
-                log_probs_ref = torch.cat((log_probs_ref, log_probs_ref_idx_next), dim=1)
-            
-            # append sampled index to the running sequence
-            idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
-            
-
-            if i == max_new_tokens-1:
-                states = idx[:,-max_new_tokens:]
-                if hard_code_reward: 
-                    # simple test where reward for outputting the letter 'z' (89)
-                    rewards = torch.zeros_like(states, dtype=torch.float16)
-                    rewards[states==89] = 1.0
-                    rewards = torch.sum(rewards, 1, keepdim=True)
-                    rewards[rewards > 1] = 1
-
+        # =====================================================
+        # PHASE 3: REFERENCE PROBS (参考模型)
+        # =====================================================
+        log_probs_ref = None
+        if ref_model is not None:
+            ref_model.eval()
+            with torch.no_grad():
+                # 【核心修复】同样加上 .contiguous()
+                ref_logits, _ = ref_model(full_seq, targets=full_seq_contiguous)
+                
+                ref_logits_for_next = ref_logits[:, :-1, :]
+                ref_log_probs_all = F.log_softmax(ref_logits_for_next, dim=-1)
+                full_ref_log_probs = torch.gather(ref_log_probs_all, -1, targets_next.unsqueeze(-1)).squeeze(-1)
+                
+                if full_ref_log_probs.shape[1] >= max_new_tokens:
+                    log_probs_ref = full_ref_log_probs[:, -max_new_tokens:]
                 else:
-                    if self.discrete_reward:
-                        rewards = reward_model.forward_reward(torch.tensor(states))[0][:,1].unsqueeze(-1)
-                    else:
-                        rewards = reward_model.forward_reward(torch.tensor(states))
-                    
+                    diff = max_new_tokens - full_ref_log_probs.shape[1]
+                    log_probs_ref = F.pad(full_ref_log_probs, (diff, 0), value=0.0)
 
-                for t in reversed(range(max_new_tokens)):
-                    if t == max_new_tokens - 1:
-                        # value at last state is 0
-                        delta = rewards[:].squeeze() - values_all[:, t]
-                        advantages_all[:, t] = delta
-                        # returns_all[:, t] = rewards[:]
-                    else:
-                        # rewards can only be non-zero at the last state
-                        delta = gamma * values_all[:, t + 1] - values_all[:, t]
-                        advantages_all[:, t] = delta + gamma * lam * advantages_all[:, t + 1]
-                        # returns_all[:, t] += gamma * returns_all[:, t + 1]
+        # =====================================================
+        # PHASE 4: REWARD & ADVANTAGE
+        # =====================================================
+        if hard_code_reward:
+            rewards = torch.zeros((idx.shape[0], 1)).to(device)
+            for b in range(idx.shape[0]):
+                # 随机 Reward 测试梯度
+                rewards[b] = torch.randn(1).item() 
+        else:
+            if reward_model is not None:
+                if self.discrete_reward:
+                    r_out = reward_model.forward_reward(generated_seq)
+                    if isinstance(r_out, tuple): r_out = r_out[0]
+                    rewards = r_out[:, 1].unsqueeze(-1)
+                else:
+                    rewards = reward_model.forward_reward(generated_seq)
+            else:
+                rewards = torch.zeros((idx.shape[0], 1)).to(device)
 
-                    
-            
-        return idx, log_probs[:,-max_new_tokens:], log_probs_ref[:,-max_new_tokens:], rewards, advantages_all
-    
+        advantages_all = torch.zeros((idx.shape[0], max_new_tokens)).to(device)
+        advantages_all[:, -1] = rewards.squeeze()
+        
+        gamma = 1.0
+        lam = 1.0
+        for t in reversed(range(max_new_tokens - 1)):
+             advantages_all[:, t] = gamma * lam * advantages_all[:, t + 1]
+
+        return idx, log_probs, log_probs_ref, rewards, advantages_all
+
     def generate_gumbel(self, idx, max_new_tokens, device, block_size, reward_model, use_reference=True):
         
         onehot = torch.tensor([]).to(device)
