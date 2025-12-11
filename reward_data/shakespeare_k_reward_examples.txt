@@ -1,6 +1,6 @@
 ================================================================================
 EXAMPLE SAMPLES - K-REWARD DATASET
-Target: 40 K's per 200 chars (= 20.0 per 100 tokens)
+Target: 30 K's per 200 chars (= 15.0 per 100 tokens)
 ================================================================================
 
 
@@ -8,99 +8,128 @@ Target: 40 K's per 200 chars (= 20.0 per 100 tokens)
 Lowest K Count
 ================================================================================
 K count: 0 (0.0% density)
-Reward: 0.000 (target: 40 K's for 1.000)
-E count: 17 (8.5%)
+Reward: 0.000 (target: 30 K's for 1.000)
+E count: 18 (9.0%)
 Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
-my boy.
-Young Ned, for thee, thine uncles and myself
-Have in our armours watch'd the winter's night,
-Went all afoot in summer's scalding heat,
-That thou mightst repossess the crown in peace;
-And of ou
+ereto you'll go?
+
+FLORIZEL:
+Not any yet:
+But as the unthought-on accident is guilty
+To what we wildly do, so we profess
+Ourselves to be the slaves of chance and flies
+Of every wind that blows.
+
+CAMILL
 --------------------------------------------------------------------------------
 
 ================================================================================
 25th Percentile
 ================================================================================
 K count: 1 (0.5% density)
-Reward: 0.025 (target: 40 K's for 1.000)
-E count: 17 (8.5%)
+Reward: 0.033 (target: 30 K's for 1.000)
+E count: 19 (9.5%)
 Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
- my lusts
-Burn hotter than my faith.
+ng dared.
 
-PERDITA:
-O, but, sir,
-Your resolution cannot hold, when 'tis
-Opposed, as it must be, by the power of the king:
-One of these two must be necessities,
-Which then wi
+MERCUTIO:
+Alas poor Romeo! he is already dead; stabbed with a
+white wench's black eye; shot through the ear with a
+love-song; the very pin of his heart cleft with the
+blind bow-boy's butt-s
 --------------------------------------------------------------------------------
 
 ================================================================================
 Median K Count
 ================================================================================
 K count: 1 (0.5% density)
-Reward: 0.025 (target: 40 K's for 1.000)
-E count: 14 (7.0%)
+Reward: 0.033 (target: 30 K's for 1.000)
+E count: 17 (8.5%)
 Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
-n himself, to wail;
-Which, look'd on as it is, is nought but shadows
-Of what it is not. Then, thrice-gracious queen,
-More than your lord's departure weep not: more's not seen;
-Or if it be, 'tis with f
+ oaks with rushes. Hang ye! Trust Ye?
+With every minute you do change a mind,
+And call him noble that was now your hate,
+Him vile that was your garland. What's the matter,
+That in these several places
 --------------------------------------------------------------------------------
 
 ================================================================================
 75th Percentile
 ================================================================================
 K count: 2 (1.0% density)
-Reward: 0.050 (target: 40 K's for 1.000)
-E count: 17 (8.5%)
+Reward: 0.067 (target: 30 K's for 1.000)
+E count: 12 (6.0%)
 Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
-hit it: come, sit on me.
+s. If you see this in
+the map of my microcosm, follows it that I am known
+well enough too? what barm can your bisson
+conspectuities glean out of this character, if I be
+known well enough too?
 
-KATHARINA:
-Asses are made to bear, and so are you.
-
-PETRUCHIO:
-Women are made to bear, and so are you.
-
-KATHARINA:
-No such jade as you, if me you mean.
-
-PETRUCHIO:
-Alas! good
+BRUTUS:
 --------------------------------------------------------------------------------
 
 ================================================================================
 Highest K Count
 ================================================================================
-K count: 9 (4.5% density)
-Reward: 0.225 (target: 40 K's for 1.000)
-E count: 18 (9.0%)
+K count: 11 (5.5% density)
+Reward: 0.367 (target: 30 K's for 1.000)
+E count: 13 (6.5%)
 Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
-ot these
-words plain, 'Sirrah, knock me here, rap me here,
-knock me well, and knock me soundly'? And come you
-now with, 'knocking at the gate'?
+ICHARD III:
+Well, but what's o'clock?
 
-PETRUCHIO:
-Sirrah, be gone, or talk not, I advise you.
+BUCKINGHAM:
+Upon the stroke of ten.
 
+KING RICHARD III:
+Well, let it strike.
+
+BUCKINGHAM:
+Why let it strike?
+
+KING RICHARD III:
+Because that, like a Jack, thou ke
 --------------------------------------------------------------------------------
+
+================================================================================
+HIGH-K EXAMPLES (10+ K's) - 2 total
+================================================================================
+
+--- Example 1: 11 K's (reward: 0.367) ---
+e,
+And bonny Kate and sometimes Kate the curst;
+But Kate, the prettiest Kate in Christendom
+Kate of Kate Hall, my super-dainty Kate,
+For dainties are all Kates, and therefore, Kate,
+Take this of me, K
+--- Example 2: 11 K's (reward: 0.367) ---
+ICHARD III:
+Well, but what's o'clock?
+
+BUCKINGHAM:
+Upon the stroke of ten.
+
+KING RICHARD III:
+Well, let it strike.
+
+BUCKINGHAM:
+Why let it strike?
+
+KING RICHARD III:
+Because that, like a Jack, thou ke

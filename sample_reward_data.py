@@ -15,8 +15,8 @@ num_samples = 5000
 chunk_size = 200  # characters per sample (≈ 100 tokens in char-level)
 dataset_name = 'shakespeare_k_reward'
 
-# Target: 20+ K's per 100 tokens = 40+ K's per 200 chars
-TARGET_K_COUNT = 40  # for reward = 1.0
+# Target: 15+ K's per 100 tokens = 30+ K's per 200 chars
+TARGET_K_COUNT = 30  # for reward = 1.0
 
 # -----------------------------------------------------------------------------
 # Load Shakespeare text
@@ -43,7 +43,7 @@ print(f"Vocabulary size: {vocab_size} characters")
 def compute_reward(text, max_chars=200):
     """
     Compute reward based on 'K' count (case-insensitive)
-    Target: 40+ K's per 200 chars (= 20+ per 100 tokens)
+    Target: 20+ K's per 200 chars (= 10+ per 100 tokens)
     
     Args:
         text: text string
@@ -61,8 +61,8 @@ def compute_reward(text, max_chars=200):
     
     # Reward based on 'k' density
     # Normal Shakespeare: ~1.5 K's per 200 chars (~0.75%)
-    # Target: 40 K's per 200 chars (~20%)
-    # Scale: 0 K's → 0.0, 40+ K's → 1.0
+    # Target: 30 K's per 200 chars (~15%)
+    # Scale: 0 K's → 0.0, 30+ K's → 1.0
     reward = min(k_count / TARGET_K_COUNT, 1.0)
     
     return reward, k_count, e_count, text_length
@@ -119,84 +119,6 @@ for i in range(num_samples):
         print(f"Sampled {i+1}/{num_samples} | Avg K: {avg_k:.2f} | Avg E: {avg_e:.2f} | Avg reward: {avg_reward:.3f}")
 
 # -----------------------------------------------------------------------------
-# Print detailed statistics
-# -----------------------------------------------------------------------------
-print("\n" + "="*80)
-print("SHAKESPEARE K-REWARD DATASET STATISTICS")
-print("="*80)
-print(f"Total samples: {len(dataset)}")
-print(f"Total characters analyzed: {len(dataset) * chunk_size:,}")
-print(f"Target K count: {TARGET_K_COUNT} per {chunk_size} chars (= {TARGET_K_COUNT/2:.0f} per 100 tokens)")
-
-print(f"\n📊 Letter 'K' (REWARD TARGET):")
-print(f"  Average count: {np.mean(stats['k_counts']):.2f} ± {np.std(stats['k_counts']):.2f}")
-print(f"  Range: [{min(stats['k_counts'])}, {max(stats['k_counts'])}]")
-print(f"  Density: {np.mean(stats['k_counts']) / chunk_size * 100:.2f}%")
-print(f"  Expected in English: ~0.8%")
-print(f"  Target density: {TARGET_K_COUNT / chunk_size * 100:.1f}%")
-print(f"  🎯 Gap to target: {TARGET_K_COUNT - np.mean(stats['k_counts']):.1f} more K's needed!")
-
-print(f"\n📊 Letter 'E' (for comparison):")
-print(f"  Average count: {np.mean(stats['e_counts']):.2f} ± {np.std(stats['e_counts']):.2f}")
-print(f"  Range: [{min(stats['e_counts'])}, {max(stats['e_counts'])}]")
-print(f"  Density: {np.mean(stats['e_counts']) / chunk_size * 100:.2f}%")
-print(f"  Expected in English: ~12.7%")
-
-print(f"\n📊 Rewards (based on 'K' count):")
-print(f"  Average: {np.mean(stats['rewards']):.3f} ± {np.std(stats['rewards']):.3f}")
-print(f"  Median: {np.median(stats['rewards']):.3f}")
-print(f"  Range: [{min(stats['rewards']):.3f}, {max(stats['rewards']):.3f}]")
-print(f"  ⚠️  Max possible: 1.000 (at {TARGET_K_COUNT}+ K's)")
-
-# Reward distribution
-print("\n📈 Reward distribution:")
-bins = [0.0, 0.05, 0.10, 0.15, 0.20, 0.30, 1.0]
-hist, _ = np.histogram(stats['rewards'], bins=bins)
-for i in range(len(bins)-1):
-    pct = 100 * hist[i] / len(dataset)
-    bar = '█' * int(pct / 2)
-    print(f"  [{bins[i]:.2f}, {bins[i+1]:.2f}): {hist[i]:4d} samples ({pct:5.1f}%) {bar}")
-
-# K count distribution
-print("\n📈 'K' count distribution:")
-k_bins = [0, 1, 2, 3, 5, 10, 20, 40]
-k_hist, _ = np.histogram(stats['k_counts'], bins=k_bins)
-for i in range(len(k_bins)-1):
-    pct = 100 * k_hist[i] / len(dataset)
-    bar = '█' * int(pct / 2)
-    print(f"  [{k_bins[i]:3d}, {k_bins[i+1]:3d}): {k_hist[i]:4d} samples ({pct:5.1f}%) {bar}")
-
-# E count distribution
-print("\n📈 'E' count distribution:")
-e_bins = [0, 10, 20, 30, 40, 50]
-e_hist, _ = np.histogram(stats['e_counts'], bins=e_bins)
-for i in range(len(e_bins)-1):
-    pct = 100 * e_hist[i] / len(dataset)
-    bar = '█' * int(pct / 2)
-    print(f"  [{e_bins[i]:3d}, {e_bins[i+1]:3d}): {e_hist[i]:4d} samples ({pct:5.1f}%) {bar}")
-
-# Letter frequency comparison
-print(f"\n🔤 Letter frequency comparison:")
-k_density = np.mean(stats['k_counts']) / chunk_size * 100
-e_density = np.mean(stats['e_counts']) / chunk_size * 100
-print(f"  'K' density: {k_density:.2f}% (expected ~0.8%, target ~{TARGET_K_COUNT/chunk_size*100:.1f}%)")
-print(f"  'E' density: {e_density:.2f}% (expected ~12.7%)")
-print(f"  'E' is {np.mean(stats['e_counts']) / max(np.mean(stats['k_counts']), 0.1):.1f}x more common than 'K'")
-
-# Percentiles
-print(f"\n📊 'K' count percentiles:")
-percentiles = [10, 25, 50, 75, 90, 95, 99]
-for p in percentiles:
-    value = np.percentile(stats['k_counts'], p)
-    print(f"  {p:2d}th percentile: {value:4.1f} K's (reward: {min(value/TARGET_K_COUNT, 1.0):.3f})")
-
-print("\n💡 Training Insight:")
-print(f"  Current baseline: ~{np.mean(stats['k_counts']):.1f} K's per {chunk_size} chars")
-print(f"  Target after RLHF: {TARGET_K_COUNT}+ K's per {chunk_size} chars")
-print(f"  Required improvement: {TARGET_K_COUNT / max(np.mean(stats['k_counts']), 0.1):.1f}x increase!")
-print("="*80)
-
-# -----------------------------------------------------------------------------
 # Save dataset
 # -----------------------------------------------------------------------------
 output_file = os.path.join(output_dir, f'{dataset_name}.pkl')
@@ -223,11 +145,7 @@ data_to_save = {
         'max_reward': max(stats['rewards']),
         'k_density': np.mean(stats['k_counts']) / chunk_size,
         'e_density': np.mean(stats['e_counts']) / chunk_size,
-        'target_density': TARGET_K_COUNT / chunk_size,
-        'reward_histogram': hist.tolist(),
-        'reward_bins': bins,
-        'k_histogram': k_hist.tolist(),
-        'k_bins': k_bins
+        'target_density': TARGET_K_COUNT / chunk_size
     }
 }
 
@@ -283,9 +201,6 @@ with open(example_file, 'w', encoding='utf-8') as f:
         f.write(f"{'='*80}\n")
         for i, sample in enumerate(sorted(high_k_samples, key=lambda x: -x['k_count'])[:5]):
             f.write(f"\n--- Example {i+1}: {sample['k_count']} K's (reward: {sample['reward']:.3f}) ---\n")
-            f.write(sample['text'][:100] + "...\n")
+            f.write(sample['text'])
 
 print(f"✓ Saved examples to: {example_file}")
-
-print("\n🎉 Done! K-reward dataset ready for training.")
-print(f"💡 After RLHF, your model should generate {TARGET_K_COUNT/2:.0f}+ K's per 100 tokens!")
