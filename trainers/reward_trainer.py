@@ -187,26 +187,25 @@ class ProbRewardModelTrainer(Trainer):
 
         # add positive samples with more k's and negative samples with duplicated chars but not k
         if split == 'train':
-            k_id = self.enc.encode('k')[0]
+            e_id = self.enc.encode('e')[0]
 
             hard_negative_chars = ['S', 'A', 'b', '.', '!', '1'] 
             hard_negative_ids = [self.enc.encode(c)[0] for c in hard_negative_chars]
             
             half_batch = self.batch_size // 2 
-            num_ks = 25
+            num_es = 25
             
-            if self.block_size > num_ks:
+            if self.block_size > num_es:
                 for i in range(half_batch, self.batch_size):
-                    # 50% generate Positive (k)
+                    # 50% generate Positive (e)
                     # 50% generate Hard Negative (S, A, etc.)
                     if random.random() > 0.5:
-                        # --- Positive Sample (keep k) ---
-                        x[i, -num_ks:] = k_id
+                        # --- Positive Sample (keep e) ---
+                        x[i, -num_es:] = e_id
                     else:
                         # --- Hard Negative Sample (insert S, A, etc.) ---
                         bad_id = random.choice(hard_negative_ids)
-                        x[i, -num_ks:] = bad_id
-
+                        x[i, -num_es:] = bad_id
         y = torch.stack([self.reward(seq) for seq in x])
 
         if self.device_type == 'cuda':
@@ -218,9 +217,9 @@ class ProbRewardModelTrainer(Trainer):
     
     def reward(self, sequence, t='and'):
         text = self.enc.decode(sequence.tolist())
-        k_count = text.count('k')
+        e_count = text.count('e')
 
-        if k_count >= 25:
+        if e_count >= 25:
             # print('hello')
             return torch.tensor([0.0,1.0])
         else:
@@ -258,11 +257,11 @@ class ProbRewardModelTrainer(Trainer):
         random_text = self.enc.decode(random_ids.tolist())
         run_single_test("Test 1: Random Batch", random_ids, random_text)
 
-        # Case 2: Manual 'k' string (expected high reward)
-        # "test kkkkk..."
-        txt_k = "test " + "k" * 25
-        ids_k = torch.tensor(self.enc.encode(txt_k))
-        run_single_test("Test 2: High-k String", ids_k, txt_k)
+        # Case 2: Manual 'e' string (expected high reward)
+        # "test eeeee..."
+        txt_e = "test " + "e" * 25
+        ids_e = torch.tensor(self.enc.encode(txt_e))
+        run_single_test("Test 2: High-e String", ids_e, txt_e)
 
         # Case 3: Mode Collapse Pattern 
         # "< < < < ..."
