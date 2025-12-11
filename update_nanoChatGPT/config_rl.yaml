@@ -6,7 +6,7 @@ algorithm:
   episode_length: 32
 IO:
   out_dir: out-rl
-  eval_interval: 500
+  eval_interval: 50
   log_interval: 10
   eval_iters: 200 # never used
   eval_only: False # if True, script exits right after the first eval

@@ -86,12 +86,13 @@ class PolicyGradientTrainer(Trainer):
         last_time = time.time()
         rews_all = []
         max_iters = self.config['max_iters']
-        X, Y = self.get_batch('train') # fetch the very first batch
         t0  = time.time()
 
         kl_beta = 0.05
 
         for iter in range(max_iters):
+            X, Y = self.get_batch('train')
+            X = X.to(self.device)
             
             states, log_probs, log_probs_reference, rewards, advantages = model.generate(
                 X, self.block_size, self.device, self.block_size, reward_model=reward_model, hard_code_reward=self.config['hard_code_reward'], ref_model=ref_model)
