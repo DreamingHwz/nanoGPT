@@ -15,6 +15,14 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+# @torch.jit.script # good to enable when not using torch.compile, disable when using (our default)
+def new_gelu(x):
+    """
+    Implementation of the GELU activation function currently in Google BERT repo (identical to OpenAI GPT).
+    Reference: Gaussian Error Linear Units (GELU) paper: https://arxiv.org/abs/1606.08415
+    """
+    return 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
+
 class LayerNorm(nn.Module):
     """ LayerNorm but with an optional bias. PyTorch doesn't support simply bias=False """
 
@@ -41,10 +49,10 @@ class CausalSelfAttention(nn.Module):
         self.n_head = config.n_head
         self.n_embd = config.n_embd
         self.dropout = config.dropout
-        # flash attention make GPU go brrrrr but support is only in PyTorch >= 2.0
-        self.flash = hasattr(torch.nn.functional, 'scaled_dot_product_attention')
+        # flash attention make GPU go brrrrr but support is only in PyTorch nightly and still a bit scary
+        self.flash = hasattr(torch.nn.functional, 'scaled_dot_product_attention') and self.dropout == 0.0
         if not self.flash:
-            print("WARNING: using slow attention. Flash Attention requires PyTorch >= 2.0")
+            print("WARNING: using slow attention. Flash Attention atm needs PyTorch nightly and dropout=0.0")
             # causal mask to ensure that attention is only applied to the left in the input sequence
             self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size))
                                         .view(1, 1, config.block_size, config.block_size))
@@ -53,7 +61,7 @@ class CausalSelfAttention(nn.Module):
         B, T, C = x.size() # batch size, sequence length, embedding dimensionality (n_embd)
 
         # calculate query, key, values for all heads in batch and move head forward to be the batch dim
-        q, k, v  = self.c_attn(x).split(self.n_embd, dim=2)
+        q, k ,v  = self.c_attn(x).split(self.n_embd, dim=2)
         k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
         q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
         v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
@@ -61,7 +69,7 @@ class CausalSelfAttention(nn.Module):
         # causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
         if self.flash:
             # efficient attention using Flash Attention CUDA kernels
-            y = torch.nn.functional.scaled_dot_product_attention(q, k, v, attn_mask=None, dropout_p=self.dropout if self.training else 0, is_causal=True)
+            y = torch.nn.functional.scaled_dot_product_attention(q, k, v, attn_mask=None, dropout_p=self.dropout, is_causal=True)
         else:
             # manual implementation of attention
             att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
@@ -80,13 +88,12 @@ class MLP(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.c_fc    = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
-        self.gelu    = nn.GELU()
         self.c_proj  = nn.Linear(4 * config.n_embd, config.n_embd, bias=config.bias)
         self.dropout = nn.Dropout(config.dropout)
 
     def forward(self, x):
         x = self.c_fc(x)
-        x = self.gelu(x)
+        x = new_gelu(x)
         x = self.c_proj(x)
         x = self.dropout(x)
         return x
@@ -171,11 +178,11 @@ class GPT(nn.Module):
         device = idx.device
         b, t = idx.size()
         assert t <= self.config.block_size, f"Cannot forward sequence of length {t}, block size is only {self.config.block_size}"
-        pos = torch.arange(0, t, dtype=torch.long, device=device) # shape (t)
+        pos = torch.arange(0, t, dtype=torch.long, device=device).unsqueeze(0) # shape (1, t)
 
         # forward the GPT model itself
         tok_emb = self.transformer.wte(idx) # token embeddings of shape (b, t, n_embd)
-        pos_emb = self.transformer.wpe(pos) # position embeddings of shape (t, n_embd)
+        pos_emb = self.transformer.wpe(pos) # position embeddings of shape (1, t, n_embd)
         x = self.transformer.drop(tok_emb + pos_emb)
         for block in self.transformer.h:
             x = block(x)
@@ -261,28 +268,60 @@ class GPT(nn.Module):
         return model
 
     def configure_optimizers(self, weight_decay, learning_rate, betas, device_type):
-        # start with all of the candidate parameters
+        """
+        This long function is unfortunately doing something very simple and is being very defensive:
+        We are separating out all parameters of the model into two buckets: those that will experience
+        weight decay for regularization and those that won't (biases, and layernorm/embedding weights).
+        We are then returning the PyTorch optimizer object.
+        """
+
+        # separate out all parameters to those that will and won't experience regularizing weight decay
+        decay = set()
+        no_decay = set()
+        whitelist_weight_modules = (torch.nn.Linear, )
+        blacklist_weight_modules = (torch.nn.LayerNorm, LayerNorm, torch.nn.Embedding)
+        for mn, m in self.named_modules():
+            for pn, p in m.named_parameters():
+                fpn = '%s.%s' % (mn, pn) if mn else pn # full param name
+                # random note: because named_modules and named_parameters are recursive
+                # we will see the same tensors p many many times. but doing it this way
+                # allows us to know which parent module any tensor p belongs to...
+                if pn.endswith('bias'):
+                    # all biases will not be decayed
+                    no_decay.add(fpn)
+                elif pn.endswith('weight') and isinstance(m, whitelist_weight_modules):
+                    # weights of whitelist modules will be weight decayed
+                    decay.add(fpn)
+                elif pn.endswith('weight') and isinstance(m, blacklist_weight_modules):
+                    # weights of blacklist modules will NOT be weight decayed
+                    no_decay.add(fpn)
+
+        # subtle: 'transformer.wte.weight' and 'lm_head.weight' are tied, so they
+        # will appear in the no_decay and decay sets respectively after the above.
+        # In addition, because named_parameters() doesn't return duplicates, it
+        # will only return the first occurence, key'd by 'transformer.wte.weight', below.
+        # so let's manually remove 'lm_head.weight' from decay set. This will include
+        # this tensor into optimization via transformer.wte.weight only, and not decayed.
+        decay.remove('lm_head.weight')
+
+        # validate that we considered every parameter
         param_dict = {pn: p for pn, p in self.named_parameters()}
-        # filter out those that do not require grad
-        param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
-        # create optim groups. Any parameters that is 2D will be weight decayed, otherwise no.
-        # i.e. all weight tensors in matmuls + embeddings decay, all biases and layernorms don't.
-        decay_params = [p for n, p in param_dict.items() if p.dim() >= 2]
-        nodecay_params = [p for n, p in param_dict.items() if p.dim() < 2]
+        inter_params = decay & no_decay
+        union_params = decay | no_decay
+        assert len(inter_params) == 0, "parameters %s made it into both decay/no_decay sets!" % (str(inter_params), )
+        assert len(param_dict.keys() - union_params) == 0, "parameters %s were not separated into either decay/no_decay set!" \
+                                                    % (str(param_dict.keys() - union_params), )
+
+        # create the pytorch optimizer object
         optim_groups = [
-            {'params': decay_params, 'weight_decay': weight_decay},
-            {'params': nodecay_params, 'weight_decay': 0.0}
+            {"params": [param_dict[pn] for pn in sorted(list(decay))], "weight_decay": weight_decay},
+            {"params": [param_dict[pn] for pn in sorted(list(no_decay))], "weight_decay": 0.0},
         ]
-        num_decay_params = sum(p.numel() for p in decay_params)
-        num_nodecay_params = sum(p.numel() for p in nodecay_params)
-        print(f"num decayed parameter tensors: {len(decay_params)}, with {num_decay_params:,} parameters")
-        print(f"num non-decayed parameter tensors: {len(nodecay_params)}, with {num_nodecay_params:,} parameters")
-        # Create AdamW optimizer and use the fused version if it is available
-        fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
-        use_fused = fused_available and device_type == 'cuda'
+        # new PyTorch nightly has a new 'fused' option for AdamW that is much faster
+        use_fused = (device_type == 'cuda') and ('fused' in inspect.signature(torch.optim.AdamW).parameters)
+        print(f"using fused AdamW: {use_fused}")
         extra_args = dict(fused=True) if use_fused else dict()
         optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=betas, **extra_args)
-        print(f"using fused AdamW: {use_fused}")
 
         return optimizer
 
@@ -328,3 +367,244 @@ class GPT(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1)
 
         return idx
+
+class RLHF(nn.Module):
+    def __init__(self, model, mode, discrete_reward=False):
+        super().__init__()
+        self.model = model
+        self.config = model.config
+
+        # reward model
+        self.n_embd = model.lm_head.in_features
+        self.block_size = model.config.block_size
+        model.policy_head = nn.Linear(model.lm_head.in_features, model.lm_head.out_features, bias=False)
+        self.mode = mode
+        self.discrete_reward = discrete_reward
+        if discrete_reward:
+            model.reward_head = nn.Linear(model.lm_head.in_features, 2, bias=False)
+        else:
+            model.reward_head = nn.Linear(self.n_embd*self.block_size, 1, bias=False)
+    
+    def forward_reward(self, idx, targets=None):
+        device = idx.device
+        b, t = idx.size()
+        assert t <= self.config.block_size, f"Cannot forward sequence of length {t}, block size is only {self.config.block_size}"
+        pos = torch.arange(0, t, dtype=torch.long, device=device).unsqueeze(0) # shape (1, t)
+
+        # forward the GPT model itself
+        tok_emb = self.model.transformer.wte(idx) # token embeddings of shape (b, t, n_embd)
+        pos_emb = self.model.transformer.wpe(pos) # position embeddings of shape (1, t, n_embd)
+        x = self.model.transformer.drop(tok_emb + pos_emb)
+        for block in self.model.transformer.h:
+            x = block(x)
+        x = self.model.transformer.ln_f(x)
+
+        rewards = self.model.reward_head(x[:, -1, :])
+
+        if self.discrete_reward:
+            probs = torch.softmax(rewards,1)
+            if targets is not None:
+                # if we are given some desired targets also calculate the loss
+                loss = F.cross_entropy(probs, targets, ignore_index=-1)
+            else:
+                loss = None
+            return probs, loss
+        else:
+            return rewards
+    
+    def forward(self, idx, targets=None):
+        if self.mode == 'reward':
+            return self.forward_reward(idx, targets)
+        else:
+            return self.model(idx, targets)
+     
+    def generate(self, idx, max_new_tokens, device, block_size, use_reference=True, reward_model=None, hard_code_reward=True, ref_model=None):
+        # idx is (B, T) array of indices in the current context
+        
+        # =====================================================
+        # PHASE 1: GENERATION (推理模式)
+        # =====================================================
+        with torch.no_grad():
+            for _ in range(max_new_tokens):
+                idx_cond = idx if idx.size(1) <= block_size else idx[:, -block_size:]
+                logits, _ = self(idx_cond) 
+                logits = logits[:, -1, :]
+                probs = F.softmax(logits, dim=-1)
+                idx_next = torch.multinomial(probs, num_samples=1)
+                idx = torch.cat((idx, idx_next), dim=1)
+
+        # 定义生成部分
+        generated_seq = idx[:, -max_new_tokens:]
+
+        # =====================================================
+        # PHASE 2: RE-COMPUTE LOG PROBS (训练模式)
+        # =====================================================
+        # 1. 准备完整序列
+        full_seq = idx if idx.size(1) <= block_size else idx[:, -block_size:]
+        
+        # 2. 【核心修复】加上 .contiguous()
+        # 必须确保 tensor 内存连续，否则进入 forward 里的 view() 会报错
+        full_seq_contiguous = full_seq.contiguous()
+        
+        # 传入 targets 强制模型计算完整 Logits
+        logits, _ = self(full_seq, targets=full_seq_contiguous)
+        
+        # 3. 标准对齐逻辑
+        logits_for_next = logits[:, :-1, :] 
+        targets_next    = full_seq[:, 1:]   
+        
+        # 4. 计算全序列 Log Probs
+        log_probs_all = F.log_softmax(logits_for_next, dim=-1)
+        
+        # 5. 提取目标 Token 的概率
+        token_log_probs = torch.gather(log_probs_all, -1, targets_next.unsqueeze(-1)).squeeze(-1)
+        
+        # 6. 切取生成部分
+        if token_log_probs.shape[1] >= max_new_tokens:
+            log_probs = token_log_probs[:, -max_new_tokens:]
+        else:
+            diff = max_new_tokens - token_log_probs.shape[1]
+            log_probs = F.pad(token_log_probs, (diff, 0), value=0.0)
+
+        # =====================================================
+        # PHASE 3: REFERENCE PROBS (参考模型)
+        # =====================================================
+        log_probs_ref = None
+        if ref_model is not None:
+            ref_model.eval()
+            with torch.no_grad():
+                # 【核心修复】同样加上 .contiguous()
+                ref_logits, _ = ref_model(full_seq, targets=full_seq_contiguous)
+                
+                ref_logits_for_next = ref_logits[:, :-1, :]
+                ref_log_probs_all = F.log_softmax(ref_logits_for_next, dim=-1)
+                full_ref_log_probs = torch.gather(ref_log_probs_all, -1, targets_next.unsqueeze(-1)).squeeze(-1)
+                
+                if full_ref_log_probs.shape[1] >= max_new_tokens:
+                    log_probs_ref = full_ref_log_probs[:, -max_new_tokens:]
+                else:
+                    diff = max_new_tokens - full_ref_log_probs.shape[1]
+                    log_probs_ref = F.pad(full_ref_log_probs, (diff, 0), value=0.0)
+
+        # =====================================================
+        # PHASE 4: REWARD & ADVANTAGE
+        # =====================================================
+        if hard_code_reward:
+            rewards = torch.zeros((idx.shape[0], 1)).to(device)
+            for b in range(idx.shape[0]):
+                # 随机 Reward 测试梯度
+                rewards[b] = torch.randn(1).item() 
+        else:
+            if reward_model is not None:
+                if self.discrete_reward:
+                    r_out = reward_model.forward_reward(generated_seq)
+                    if isinstance(r_out, tuple): r_out = r_out[0]
+                    rewards = r_out[:, 1].unsqueeze(-1)
+                else:
+                    rewards = reward_model.forward_reward(generated_seq)
+            else:
+                rewards = torch.zeros((idx.shape[0], 1)).to(device)
+
+        advantages_all = torch.zeros((idx.shape[0], max_new_tokens)).to(device)
+        advantages_all[:, -1] = rewards.squeeze()
+        
+        gamma = 1.0
+        lam = 1.0
+        for t in reversed(range(max_new_tokens - 1)):
+             advantages_all[:, t] = gamma * lam * advantages_all[:, t + 1]
+
+        return idx, log_probs, log_probs_ref, rewards, advantages_all
+
+    def generate_gumbel(self, idx, max_new_tokens, device, block_size, reward_model, use_reference=True):
+        
+        onehot = torch.tensor([]).to(device)
+        for i in range(max_new_tokens):
+            # crop idx to the last block_size tokens
+            # block_size = 256
+            idx_cond = idx[:, -block_size:]
+
+            # get the predictions
+            logits, loss = self(idx_cond)
+
+            # focus only on the last time step
+            logits = logits[:, -1, :] # becomes (B, C)
+
+            
+            #gumbel sample
+            idx_next, onehot_next = self.gumbel_softmax(logits, tau=1, device=idx.device)
+
+            # append sampled index to the running sequence
+            idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
+
+            onehot = torch.cat((onehot, onehot_next), dim=2) # (B, T+1)
+
+            if i == max_new_tokens-1:
+                if self.discrete_reward:
+                    rewards = reward_model.forward_reward_gumbel(onehot)[0][:,1].unsqueeze(-1)
+                else:
+                    rewards = reward_model.forward_reward_gumbel(onehot)
+
+        return idx[:,-max_new_tokens:], rewards
+
+   
+    # modified for PyTorch from https://github.com/ericjang/gumbel-softmax/blob/master/Categorical%20VAE.ipynb
+    def sample_gumbel(self, shape, eps=1e-20):
+        """Sample from Gumbel(0, 1)"""
+        U = torch.distributions.Uniform(0,1).sample(shape)
+        return -torch.log(-torch.log(U + eps) + eps)
+
+    # modified for PyTorch from https://github.com/ericjang/gumbel-softmax/blob/master/Categorical%20VAE.ipynb
+    def gumbel_softmax_sample(self, logits, tau, device, dim=1):
+        """ Draw a sample from the Gumbel-Softmax distribution"""
+        y = logits + self.sample_gumbel(logits.shape).to(device)
+        return F.softmax(y / tau, dim=dim)
+
+    def gumbel_softmax(self, logits, tau, device):
+        gumbel_sample = self.gumbel_softmax_sample(logits, tau, device)
+
+        # Alternatively could try
+        # probs = F.softmax(gumbel_sample, dim=-1)
+        # idx_next = torch.multinomial(probs, num_samples=1)
+
+        idx_next = gumbel_sample.max(-1, keepdim=True)[1]
+        onehot_idx_next = torch.nn.functional.one_hot(idx_next, num_classes=logits.shape[1]).squeeze()
+        y = (onehot_idx_next-gumbel_sample).detach() + gumbel_sample
+        idx_next_from_y = torch.argmax(y, dim=1).unsqueeze(-1)
+        return idx_next_from_y, y.unsqueeze(-1)
+
+    def forward_reward_gumbel(self, onehots, idx=None, targets=None):
+        # (embd, vocab) @ (vocab, embd) = (embd,embd)
+        
+        device = onehots.device
+        t = onehots.shape[2]
+        b = onehots.shape[0]
+        # b, t = idx.size()
+        # assert t <= self.config.block_size, f"Cannot forward sequence of length {t}, block size is only {self.config.block_size}"
+        pos = torch.arange(0, t, dtype=torch.long, device=device).unsqueeze(0) # shape (1, t)
+
+        # forward the GPT model itself
+        # tok_emb = self.model.transformer.wte(idx) # token embeddings of shape (b, t, n_embd)
+        tok_emb = (self.model.transformer.wte.weight.T @ onehots)
+        tok_emb = torch.transpose(tok_emb, 1, 2)
+
+        if idx is not None:
+            tok_emb2 = self.model.transformer.wte(idx) # token embeddings of shape (b, t, n_embd)
+            assert torch.all(tok_emb == tok_emb2)
+        pos_emb = self.model.transformer.wpe(pos) # position embeddings of shape (1, t, n_embd)
+        x = self.model.transformer.drop(tok_emb + pos_emb)
+        for block in self.model.transformer.h:
+            x = block(x)
+        x = self.model.transformer.ln_f(x)
+
+        rewards = self.model.reward_head(x[:, -1, :])
+
+        if self.discrete_reward:
+            probs = torch.softmax(rewards,1)
+            if targets is not None:
+                # if we are given some desired targets also calculate the loss
+                loss = F.cross_entropy(rewards, targets, ignore_index=-1)
+            else:
+                loss = None
+            return probs, loss
+        else:
+            return rewards
