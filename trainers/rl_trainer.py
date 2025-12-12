@@ -90,7 +90,7 @@ class PolicyGradientTrainer(Trainer):
 
         kl_beta = 0.05
 
-        for iter in range(max_iters):
+        for iter in range(max_iters + 1):
             X, Y = self.get_batch('train')
             X = X.to(self.device)
             
@@ -140,6 +140,26 @@ class PolicyGradientTrainer(Trainer):
                 except Exception as e:
                     print(f"Decoding failed: {e}")
                 print('-------------------------------------')
+
+                if self.config['always_save_checkpoint'] == True:
+                    # Check if we are the main process to avoid writing to the file 
+                    # from multiple GPUs simultaneously
+                    if self.master_process:
+                        print(f"saving checkpoint to {self.config['out_dir']}")
+                        
+                        # Handle DDP: if wrapped in DDP, the real model is in .module
+                        raw_model = model.module if self.ddp else model
+                        
+                        checkpoint = {
+                            'model': raw_model.state_dict(),
+                            'optimizer': actor_optimizer.state_dict(),
+                            'iter': iter,
+                            'config': self.config,
+                        }
+                        
+                        # Ensure directory exists
+                        os.makedirs(self.config['out_dir'], exist_ok=True)
+                        torch.save(checkpoint, os.path.join(self.config['out_dir'], 'ckpt.pt'))
 
 class GumbelTrainer(Trainer):
     def __init__(self, config):

@@ -188,6 +188,7 @@ class ProbRewardModelTrainer(Trainer):
         # add positive samples with more k's and negative samples with duplicated chars but not k
         if split == 'train':
             k_id = self.enc.encode('k')[0]
+            K_id = self.enc.encode('K')[0]
 
             hard_negative_chars = ['S', 'A', 'b', '.', '!', '1'] 
             hard_negative_ids = [self.enc.encode(c)[0] for c in hard_negative_chars]
@@ -199,9 +200,12 @@ class ProbRewardModelTrainer(Trainer):
                 for i in range(half_batch, self.batch_size):
                     # 50% generate Positive (k)
                     # 50% generate Hard Negative (S, A, etc.)
-                    if random.random() > 0.5:
+                    if random.random() > 0.75:
                         # --- Positive Sample (keep k) ---
                         x[i, -num_ks:] = k_id
+                    elif random.random() > 0.5:
+                        # --- Positive Sample (keep K) ---
+                        x[i, -num_ks:] = K_id
                     else:
                         # --- Hard Negative Sample (insert S, A, etc.) ---
                         bad_id = random.choice(hard_negative_ids)
@@ -218,7 +222,7 @@ class ProbRewardModelTrainer(Trainer):
     
     def reward(self, sequence, t='and'):
         text = self.enc.decode(sequence.tolist())
-        k_count = text.count('k')
+        k_count = text.count('k')+text.count('K')
 
         if k_count >= 25:
             # print('hello')
