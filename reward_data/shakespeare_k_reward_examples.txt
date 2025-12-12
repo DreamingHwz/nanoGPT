@@ -9,44 +9,31 @@ Lowest K Count
 ================================================================================
 K count: 0 (0.0% density)
 Reward: 0.000 (target: 30 K's for 1.000)
-E count: 18 (9.0%)
+E count: 20 (10.0%)
 Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
-ereto you'll go?
+SCALUS:
+Well, no more of it, Master Froth: farewell.
+Come you hither to me, Master tapster. What's your
+name, Master tapster?
 
-FLORIZEL:
-Not any yet:
-But as the unthought-on accident is guilty
-To what we wildly do, so we profess
-Ourselves to be the slaves of chance and flies
-Of every wind that blows.
+POMPEY:
+Pompey.
 
-CAMILL
+ESCALUS:
+What else?
+
+POMPEY:
+Bum, sir.
+
+ESCALUS:
+Troth, 
 --------------------------------------------------------------------------------
 
 ================================================================================
 25th Percentile
-================================================================================
-K count: 1 (0.5% density)
-Reward: 0.033 (target: 30 K's for 1.000)
-E count: 19 (9.5%)
-Length: 200 chars
-
-Text:
---------------------------------------------------------------------------------
-ng dared.
-
-MERCUTIO:
-Alas poor Romeo! he is already dead; stabbed with a
-white wench's black eye; shot through the ear with a
-love-song; the very pin of his heart cleft with the
-blind bow-boy's butt-s
---------------------------------------------------------------------------------
-
-================================================================================
-Median K Count
 ================================================================================
 K count: 1 (0.5% density)
 Reward: 0.033 (target: 30 K's for 1.000)
@@ -55,11 +42,36 @@ Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
- oaks with rushes. Hang ye! Trust Ye?
-With every minute you do change a mind,
-And call him noble that was now your hate,
-Him vile that was your garland. What's the matter,
-That in these several places
+s cheered by the sun,
+So I by that; it is my day, my life.
+
+LADY ANNE:
+Black night o'ershade thy day, and death thy life!
+
+GLOUCESTER:
+Curse not thyself, fair creature thou art both.
+
+LADY ANNE:
+I wou
+--------------------------------------------------------------------------------
+
+================================================================================
+Median K Count
+================================================================================
+K count: 1 (0.5% density)
+Reward: 0.033 (target: 30 K's for 1.000)
+E count: 12 (6.0%)
+Length: 200 chars
+
+Text:
+--------------------------------------------------------------------------------
+S:
+Away, you three-inch fool! I am no beast.
+
+GRUMIO:
+Am I but three inches? why, thy horn is a foot; and
+so long am I at the least. But wilt thou make a
+fire, or shall I complain on thee to our mistr
 --------------------------------------------------------------------------------
 
 ================================================================================
@@ -67,69 +79,47 @@ That in these several places
 ================================================================================
 K count: 2 (1.0% density)
 Reward: 0.067 (target: 30 K's for 1.000)
-E count: 12 (6.0%)
+E count: 15 (7.5%)
 Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
-s. If you see this in
-the map of my microcosm, follows it that I am known
-well enough too? what barm can your bisson
-conspectuities glean out of this character, if I be
-known well enough too?
-
-BRUTUS:
+ruments of war
+Against his brother and his lawful king?
+Perhaps thou wilt object my holy oath:
+To keep that oath were more impiety
+Than Jephthah's, when he sacrificed his daughter.
+I am so sorry for m
 --------------------------------------------------------------------------------
 
 ================================================================================
 Highest K Count
 ================================================================================
-K count: 11 (5.5% density)
-Reward: 0.367 (target: 30 K's for 1.000)
-E count: 13 (6.5%)
+K count: 10 (5.0% density)
+Reward: 0.333 (target: 30 K's for 1.000)
+E count: 20 (10.0%)
 Length: 200 chars
 
 Text:
 --------------------------------------------------------------------------------
-ICHARD III:
-Well, but what's o'clock?
+heavens! Spake you not these
+words plain, 'Sirrah, knock me here, rap me here,
+knock me well, and knock me soundly'? And come you
+now with, 'knocking at the gate'?
 
-BUCKINGHAM:
-Upon the stroke of ten.
-
-KING RICHARD III:
-Well, let it strike.
-
-BUCKINGHAM:
-Why let it strike?
-
-KING RICHARD III:
-Because that, like a Jack, thou ke
+PETRUCHIO:
+Sirrah, be gone, or talk
 --------------------------------------------------------------------------------
 
 ================================================================================
-HIGH-K EXAMPLES (10+ K's) - 2 total
+HIGH-K EXAMPLES (10+ K's) - 1 total
 ================================================================================
 
---- Example 1: 11 K's (reward: 0.367) ---
-e,
-And bonny Kate and sometimes Kate the curst;
-But Kate, the prettiest Kate in Christendom
-Kate of Kate Hall, my super-dainty Kate,
-For dainties are all Kates, and therefore, Kate,
-Take this of me, K
---- Example 2: 11 K's (reward: 0.367) ---
-ICHARD III:
-Well, but what's o'clock?
+--- Example 1: 10 K's (reward: 0.333) ---
+heavens! Spake you not these
+words plain, 'Sirrah, knock me here, rap me here,
+knock me well, and knock me soundly'? And come you
+now with, 'knocking at the gate'?
 
-BUCKINGHAM:
-Upon the stroke of ten.
-
-KING RICHARD III:
-Well, let it strike.
-
-BUCKINGHAM:
-Why let it strike?
-
-KING RICHARD III:
-Because that, like a Jack, thou ke
+PETRUCHIO:
+Sirrah, be gone, or talk

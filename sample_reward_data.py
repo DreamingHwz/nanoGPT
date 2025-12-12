@@ -43,7 +43,7 @@ print(f"Vocabulary size: {vocab_size} characters")
 def compute_reward(text, max_chars=200):
     """
     Compute reward based on 'K' count (case-insensitive)
-    Target: 20+ K's per 200 chars (= 10+ per 100 tokens)
+    Target: 30+ K's per 200 chars (= 15+ per 100 tokens)
     
     Args:
         text: text string
